@@ -1,4 +1,8 @@
-public class Bishop extends Piece{
+package pieces;
+import board.Board;
+import board.Tile;
+
+public class Bishop extends Piece {
     public Bishop(boolean isWhite) {
         super("bishop", isWhite);
     }

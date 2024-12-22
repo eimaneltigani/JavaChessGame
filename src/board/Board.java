@@ -1,3 +1,7 @@
+package board;
+
+import pieces.*;
+
 public class Board {
     Tile[][] board;
 
@@ -74,4 +78,5 @@ public class Board {
     public void setBoard(Tile[][] board) {
         this.board = board;
     }
+
 }

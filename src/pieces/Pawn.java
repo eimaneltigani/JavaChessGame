@@ -1,4 +1,8 @@
-public class Pawn extends Piece{
+package pieces;
+import board.Board;
+import board.Tile;
+
+public class Pawn extends Piece {
     public Pawn(boolean isWhite) {
         super("pawn", isWhite);
     }

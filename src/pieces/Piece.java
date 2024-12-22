@@ -1,3 +1,10 @@
+package pieces;
+import board.Board;
+import board.Tile;
+
+/**
+ * Abstract class to represent common functionality of all chess pieces
+ */
 public abstract class Piece {
     String type;
     boolean isWhite;

@@ -1,4 +1,8 @@
-public class Rook extends Piece{
+package pieces;
+import board.Board;
+import board.Tile;
+
+public class Rook extends Piece {
     public Rook(boolean isWhite) {
         super("rook", isWhite);
     }

@@ -1,4 +1,8 @@
-public class Knight extends Piece{
+package pieces;
+import board.Board;
+import board.Tile;
+
+public class Knight extends Piece {
     public Knight(boolean isWhite) {
         super("knight", isWhite);
     }

@@ -1,3 +1,7 @@
+package pieces;
+import board.Board;
+import board.Tile;
+
 public class King extends Piece {
     public King(boolean isWhite) {
         super("king", isWhite);
