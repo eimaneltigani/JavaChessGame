@@ -29,18 +29,18 @@ public class Board {
         boolean black = false;
 
         // Set white piece row
-        board[7][0] = new Tile(null,7,0);
-        board[7][1] = new Tile(null,7,1);
-        board[7][2] = new Tile(null,7,2);
-        board[7][3] = new Tile(null,7,3);
-        board[7][4] = new Tile(null,7,4);
-        board[7][5] = new Tile(null,7,5);
-        board[7][6] = new Tile(null,7,6);
-        board[7][7] = new Tile(null,7,7);
+        board[7][0] = new Tile(new Rook(white),7,0);
+        board[7][1] = new Tile(new Knight(white),7,1);
+        board[7][2] = new Tile(new Bishop(white),7,2);
+        board[7][3] = new Tile(new Queen(white),7,3);
+        board[7][4] = new Tile(new King(white),7,4);
+        board[7][5] = new Tile(new Bishop(white),7,5);
+        board[7][6] = new Tile(new Knight(white),7,6);
+        board[7][7] = new Tile(new Rook(white),7,7);
 
         // Set white pawns
         for (int i=0;i<8;i++) {
-            board[6][i] = new Tile(null,6,i);
+            board[6][i] = new Tile(new Pawn(white),6,i);
         }
 
         // Set empty rows
@@ -52,18 +52,18 @@ public class Board {
 
         // Set black pawns
         for (int i=0;i<8;i++) {
-            board[1][i] = new Tile(null,1,i);
+            board[1][i] = new Tile(new Pawn(black),1,i);
         }
 
         // Set black piece row
-        board [0][0] = new Tile(null,0,0);
-        board [0][1] = new Tile(null,0,1);
-        board [0][2] = new Tile(null,0,2);
-        board [0][3] = new Tile(null,0,3);
-        board [0][4] = new Tile(null,0,4);
-        board [0][5] = new Tile(null,0,5);
-        board [0][6] = new Tile(null,0,6);
-        board [0][7] = new Tile(null,0,7);
+        board [0][0] = new Tile(new Rook(black),0,0);
+        board [0][1] = new Tile(new Knight(black),0,1);
+        board [0][2] = new Tile(new Bishop(black),0,2);
+        board [0][3] = new Tile(new Queen(black),0,3);
+        board [0][4] = new Tile(new King(black),0,4);
+        board [0][5] = new Tile(new Bishop(black),0,5);
+        board [0][6] = new Tile(new Knight(black),0,6);
+        board [0][7] = new Tile(new Rook(black),0,7);
 
     }
 
