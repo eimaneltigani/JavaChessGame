@@ -13,6 +13,7 @@ public class GamePanel extends JPanel implements Runnable {
     final int FPS = 60;
     // use thread class to run game loop
     Thread gameThread;
+    ChessGUI view = new ChessGUI();
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -58,5 +59,8 @@ public class GamePanel extends JPanel implements Runnable {
     // aka hands all the drawing stuff (board, pieces, on-screen messages, etc.)
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        Graphics2D g2 = (Graphics2D)g;
+        view.draw(g2);
     }
 }
