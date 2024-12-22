@@ -14,5 +14,8 @@ public class Main {
 
         window.setLocationRelativeTo(null); // window will show up at center of monitor
         window.setVisible(true);
+
+        // call method after window is created
+        gp.launchGame();
     }
 }
