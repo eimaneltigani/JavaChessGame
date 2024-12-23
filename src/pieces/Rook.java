@@ -1,14 +1,13 @@
 package pieces;
-import board.Board;
-import board.Tile;
+import board.Piece;
 
 public class Rook extends Piece {
-    public Rook(boolean isWhite) {
-        super("rook", isWhite);
+    public Rook(boolean isWhite, int col, int row) {
+        super("rook", isWhite, col, row);
     }
 
     @Override
-    public boolean canMove(Board board, Tile start, Tile end) {
+    public boolean canMove(int targetCol, int targetRow) {
         return false;
     }
 }

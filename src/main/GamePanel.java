@@ -1,5 +1,11 @@
+package main;
+
+import board.Board;
+import board.Piece;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * Use this class as game screen
@@ -13,20 +19,34 @@ public class GamePanel extends JPanel implements Runnable {
     final int FPS = 60;
     // use thread class to run game loop
     Thread gameThread;
-    ChessGUI view = new ChessGUI();
+    ChessBoard view = new ChessBoard();
+
+    // PIECES
+    public static ArrayList<Piece> pieces;
+    public static ArrayList<Piece> simPieces = new ArrayList<>();
+
+    // COLOR
+    public static final int WHITE = 0;
+    public static final int BLACK = 1;
+    int currentColor = WHITE;
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.BLACK);
+
+        // set board
+        Board board = new Board();
+        pieces = board.getAllPieces();
+        board.copyBoard(pieces, simPieces);
     }
 
     //instantiate thread
     public void launchGame() {
         gameThread = new Thread(this);
-        gameThread.start(); // call run method
+        gameThread.start(); // calls run method
     }
 
-    //
+
     @Override
     public void run() {
         // GAME LOOP - use System.nanoTime() to measure elapsed time and call update
@@ -61,6 +81,13 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D)g;
+
+        // BOARD
         view.draw(g2);
+
+        // PIECES
+        for (Piece p : simPieces) {
+            p.draw(g2);
+        }
     }
 }

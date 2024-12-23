@@ -1,14 +1,13 @@
 package pieces;
-import board.Board;
-import board.Tile;
+import board.Piece;
 
 public class Knight extends Piece {
-    public Knight(boolean isWhite) {
-        super("knight", isWhite);
+    public Knight(boolean isWhite, int col, int row) {
+        super("knight", isWhite, col, row);
     }
 
     @Override
-    public boolean canMove(Board board, Tile start, Tile end) {
+    public boolean canMove(int targetCol, int targetRow) {
         return false;
     }
 }

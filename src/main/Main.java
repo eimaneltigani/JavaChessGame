@@ -1,3 +1,5 @@
+package main;
+
 import javax.swing.*;
 
 public class Main {
@@ -7,7 +9,7 @@ public class Main {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Shut down program on window close or else it'll keep running
         window.setResizable(false);
 
-        // Add GamePanel to window
+        // Add main.GamePanel to window
         GamePanel gp = new GamePanel();
         window.add(gp);
         window.pack();
