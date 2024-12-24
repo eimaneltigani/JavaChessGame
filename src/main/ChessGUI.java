@@ -2,6 +2,7 @@ package main;
 
 import board.Board;
 import board.Piece;
+import player.Player;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,6 +22,7 @@ public class ChessGUI {
     PieceButton[][] buttons = new PieceButton[8][8];
 
 
+
     public static final int WIDTH = 1100;
     public static final int HEIGHT = 800;
     final int MAX_ROW = 8;
@@ -29,8 +31,10 @@ public class ChessGUI {
     //Color
     public static final int WHITE = 0;
     public static final int BLACK = 1;
-    int currentColor = WHITE;
-    boolean firstUpdate = true;
+    Player currPlayer;
+
+    Piece selectedPiece;
+    ArrayList<int[]> legalMoves;
 
 
     public ChessGUI() {
@@ -89,7 +93,7 @@ public class ChessGUI {
 
 
     // called after player updates model
-    public void updateBoard(Board board, int playerColor) {
+    public void updateBoard(Board board, Player player) {
         Piece[][] modelBoard = board.getBoard();
         // iterate through game board and update to match model board
         for (int row = 0; row < MAX_ROW; row++) {
@@ -101,20 +105,29 @@ public class ChessGUI {
             }
         }
 
-        // once update is complete that means player has made their move so update current player
-        // if current player is human (white), switch to computer and deactivate click functionality
-        if (playerColor == WHITE && !firstUpdate) {
-            currentColor = BLACK;
-            disableUserClicks();
+        switchPlayer(player);
+    }
+
+    public void switchPlayer(Player player) {
+        // if first update
+        if(currPlayer == null) {
+            currPlayer = player;
         } else {
-            currentColor = WHITE;
-            enableUserClicks();
+            currPlayer = player.getOpponent();
         }
 
-        if(firstUpdate) {
-            firstUpdate = false;
+        // if current player is human, enable clicks
+        if(currPlayer.getColor() == WHITE) {
+            enableUserClicks();
+        } else {
+            disableUserClicks();
         }
+
+        // update players turn panel
     }
+
+
+
 
     // enable user clicks on white pieces
     public void enableUserClicks() {
@@ -146,13 +159,50 @@ public class ChessGUI {
         int col = clickedButton.col;
 
         Piece piece = clickedButton.getPiece();
-        ArrayList<int[]> legalMoves = piece.legalMoves();
-        if(legalMoves!=null) {
-            for(int i=0; i<legalMoves.size();i++) {
-                System.out.println(legalMoves.get(i));
+
+        // users first click for turn
+        if (selectedPiece == null || piece.isWhite() == selectedPiece.isWhite()) {
+            if (selectedPiece != null) {
+                removeHighlight();
+            }
+
+            selectedPiece = piece;
+            legalMoves = selectedPiece.legalMoves();
+            highlightLegalMoves();
+        } else {
+            // they're moving pieces
+            currPlayer.makeMove(selectedPiece, row, col);
+            selectedPiece = null;
+            removeHighlight();
+        }
+
+
+        System.out.println("Clicked row: " + row + ", col: " + col);
+    }
+
+    public void highlightLegalMoves() {
+
+        if(legalMoves == null) {
+            System.out.println("no legal moves for selected piece, pick another one!");
+        } else {
+            for (int[] move : legalMoves) {
+                int x = move[0];
+                int y = move[1];
+                PieceButton button = buttons[x][y];
+                button.highlightBackground();
             }
         }
 
-        System.out.println("Clicked row: " + row + ", col: " + col);
+    }
+
+    public void removeHighlight() {
+        for (int[] move : legalMoves) {
+            int x = move[0];
+            int y = move[1];
+            PieceButton button = buttons[x][y];
+            button.removeHighlight();
+        }
+
+        legalMoves = null;
     }
 }

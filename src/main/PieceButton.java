@@ -15,14 +15,16 @@ public class PieceButton extends JButton {
     public BufferedImage image;
     int row;
     int col;
+    Color tileColor;
     Color backgroundColor;
 
     public PieceButton(int row, int col, Color color) {
         this.row = row;
         this.col = col;
-        this.backgroundColor = color;
+        this.tileColor = color;
+        this.backgroundColor = tileColor;
         setBackground(backgroundColor);
-        setBorderPainted(false); // Remove border for a cleaner look
+//        setBorderPainted(false); // Remove border for a cleaner look
         setFocusPainted(false);  // Prevent focus outline
         setContentAreaFilled(false); // Let paintComponent handle the background
     }
@@ -43,6 +45,16 @@ public class PieceButton extends JButton {
 
     public Piece getPiece() {
         return this.piece;
+    }
+
+    public void highlightBackground() {
+        this.backgroundColor = Color.GREEN;
+        repaint(); // Request re-rendering to apply the new background
+    }
+
+    public void removeHighlight() {
+        this.backgroundColor = tileColor;
+        repaint(); // Request re-rendering to apply the new background
     }
 
     public BufferedImage getImage(String imagePath) {
