@@ -1,9 +1,23 @@
 package player;
 
-public class HumanPlayer extends Player {
+import board.Board;
+import main.ChessGUI;
 
-    public HumanPlayer(boolean whiteSide) {
-        this.whiteSide = whiteSide;
-        this.humanPlayer = true;
+public class HumanPlayer implements Player {
+    ChessGUI gui;
+    Board board;
+    int	playerColor;
+
+    public HumanPlayer() {
+        gui = new ChessGUI();
+        this.playerColor = 0;
+    }
+    public void update(Board board)
+    {
+        gui.updateBoard(board);
+    }
+
+    public int getColor() {
+        return playerColor;
     }
 }

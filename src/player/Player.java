@@ -1,14 +1,11 @@
 package player;
 
-public abstract class Player {
-    public boolean whiteSide;
-    public boolean humanPlayer;
+import board.Board;
 
-    public boolean isWhiteSide() {
-        return this.whiteSide;
-    }
+public interface Player {
+//    void makeMove(Board board);
 
-    public boolean isHumanPlayer() {
-        return this.humanPlayer;
-    }
+    void update(Board board);
+
+    int getColor();
 }

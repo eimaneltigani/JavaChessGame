@@ -4,6 +4,10 @@ import pieces.*;
 
 import java.util.ArrayList;
 
+
+/**
+ * Game board data structure.
+ */
 public class Board {
     Piece[][] board;
     ArrayList<Piece> allPieces;
@@ -90,22 +94,20 @@ public class Board {
 
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                if (board[row][col] != null && board[row][col].isWhite()) {
-                    whitePieces.add(board[row][col]);
+                if(board[row][col] != null) {
+                    if(board[row][col].isWhite()) {
+                        whitePieces.add(board[row][col]);
+                    } else {
+                        blackPieces.add(board[row][col]);
+                    }
                     allPieces.add(board[row][col]);
                 }
-            }
-        }
 
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                if (board[row][col] != null && !board[row][col].isWhite()) {
-                    blackPieces.add(board[row][col]);
-                    allPieces.add(board[row][col]);
-                }
             }
         }
     }
+
+    public static void movePiece() {}
 
     public void copyBoard(ArrayList<Piece> source, ArrayList<Piece> target) {
         target.clear();
@@ -121,6 +123,8 @@ public class Board {
     public void setBoard(Piece[][] board) {
         this.board = board;
     }
+
+
 
     public void setAllPieces(ArrayList<Piece> allPieces) {
         this.allPieces = allPieces;

@@ -1,9 +1,20 @@
 package player;
 
-public class ComputerPlayer extends Player{
+import board.Board;
+import main.ChessGUI;
 
-    public ComputerPlayer(boolean whiteSide) {
-        this.whiteSide = whiteSide;
-        this.humanPlayer = false;
+public class ComputerPlayer implements Player {
+
+    ChessGUI gui;
+    Board board;
+    int	playerColor;
+
+    public void update(Board board)
+    {
+        gui.updateBoard(board);
+    }
+
+    public int getColor() {
+        return playerColor;
     }
 }
