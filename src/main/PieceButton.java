@@ -29,11 +29,20 @@ public class PieceButton extends JButton {
 
     public void setPiece(Piece p) {
         piece = p;
-        isEmpty = false;
-        char colorChar = p.isWhite() ? 'w' : 'b';
-        String imagePath = MessageFormat.format("/piece/{0}-{1}", colorChar, p.getType());
-        this.image = getImage(imagePath);
+        if (p==null) {
+            isEmpty = true;
+        } else {
+            isEmpty = false;
+            char colorChar = p.isWhite() ? 'w' : 'b';
+            String imagePath = MessageFormat.format("/piece/{0}-{1}", colorChar, p.getType());
+            this.image = getImage(imagePath);
+        }
+
         repaint(); // Request re-rendering to display the piece
+    }
+
+    public Piece getPiece() {
+        return this.piece;
     }
 
     public BufferedImage getImage(String imagePath) {

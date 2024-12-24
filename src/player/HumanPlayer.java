@@ -9,12 +9,13 @@ public class HumanPlayer implements Player {
     int	playerColor;
 
     public HumanPlayer() {
-        gui = new ChessGUI();
         this.playerColor = 0;
+        gui = new ChessGUI();
     }
+
     public void update(Board board)
     {
-        gui.updateBoard(board);
+        gui.updateBoard(board, playerColor);
     }
 
     public int getColor() {

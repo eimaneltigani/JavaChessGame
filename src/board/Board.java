@@ -107,7 +107,28 @@ public class Board {
         }
     }
 
-    public static void movePiece() {}
+    public void movePiece(Piece p, int targetRow, int targetCol) {
+        int currRow = p.getRow();
+        int currCol = p.getCol();
+
+        // if capturing piece, update pieces array
+        if(board[targetRow][targetCol]!=null) {
+            Piece capturedPiece = board[targetRow][targetCol];
+            if(capturedPiece.isWhite()) {
+                whitePieces.remove(capturedPiece);
+            } else {
+                blackPieces.remove(capturedPiece);
+            }
+            capturedPieces.add(capturedPiece);
+            allPieces.remove(capturedPiece);
+        }
+        // update Piece coordinates
+        p.setRow(targetRow);
+        p.setCol(targetCol);
+        //update board
+        board[targetRow][targetCol] = board[currRow][currCol];
+        board[currRow][currCol] = null;
+    }
 
     public void copyBoard(ArrayList<Piece> source, ArrayList<Piece> target) {
         target.clear();
@@ -123,8 +144,6 @@ public class Board {
     public void setBoard(Piece[][] board) {
         this.board = board;
     }
-
-
 
     public void setAllPieces(ArrayList<Piece> allPieces) {
         this.allPieces = allPieces;

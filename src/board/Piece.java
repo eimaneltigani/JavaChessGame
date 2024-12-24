@@ -1,10 +1,5 @@
 package board;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.text.MessageFormat;
 
 /**
  * Abstract class to represent common functionality of all chess pieces
@@ -12,7 +7,7 @@ import java.text.MessageFormat;
 public abstract class Piece {
     String type;
     boolean isWhite;
-    public int col, row;
+    public int row, col;
 
     /**
      * Constructor
@@ -27,7 +22,6 @@ public abstract class Piece {
         this.col = col;
         this.row = row;
     }
-
 
     public String getType() {
         return type;
@@ -46,5 +40,21 @@ public abstract class Piece {
     }
 
     public abstract boolean canMove(int targetCol, int targetRow);
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public void setCol(int col) {
+        this.col = col;
+    }
+
+    public int getCol() {
+        return this.col;
+    }
 
 }

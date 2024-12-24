@@ -9,9 +9,13 @@ public class ComputerPlayer implements Player {
     Board board;
     int	playerColor;
 
+    public ComputerPlayer() {
+        this.playerColor = 1;
+    }
+
     public void update(Board board)
     {
-        gui.updateBoard(board);
+        gui.updateBoard(board, playerColor);
     }
 
     public int getColor() {
