@@ -31,7 +31,6 @@ public class ChessGUI {
     public static final int BLACK = 1;
     int currentColor = WHITE;
     boolean firstUpdate = true;
-    ArrayList<Piece> pieces;
 
 
     public ChessGUI() {
@@ -145,6 +144,14 @@ public class ChessGUI {
         PieceButton clickedButton = (PieceButton) e.getSource();
         int row = clickedButton.row;
         int col = clickedButton.col;
+
+        Piece piece = clickedButton.getPiece();
+        ArrayList<int[]> legalMoves = piece.legalMoves();
+        if(legalMoves!=null) {
+            for(int i=0; i<legalMoves.size();i++) {
+                System.out.println(legalMoves.get(i));
+            }
+        }
 
         System.out.println("Clicked row: " + row + ", col: " + col);
     }

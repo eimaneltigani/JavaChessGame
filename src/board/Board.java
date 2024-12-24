@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Game board data structure.
  */
 public class Board {
-    Piece[][] board;
+    public static Piece[][] board;
     ArrayList<Piece> allPieces;
     ArrayList<Piece> whitePieces;
     ArrayList<Piece> blackPieces;
@@ -94,17 +94,22 @@ public class Board {
 
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                if(board[row][col] != null) {
-                    if(board[row][col].isWhite()) {
-                        whitePieces.add(board[row][col]);
+                Piece p = board[row][col];
+                if(p != null) {
+                    if(p.isWhite()) {
+                        whitePieces.add(p);
                     } else {
-                        blackPieces.add(board[row][col]);
+                        blackPieces.add(p);
                     }
-                    allPieces.add(board[row][col]);
+                    allPieces.add(p);
                 }
 
             }
         }
+    }
+
+    public static Piece findPieceByLocation(int row, int col) {
+        return board[row][col];
     }
 
     public void movePiece(Piece p, int targetRow, int targetCol) {

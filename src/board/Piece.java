@@ -1,6 +1,8 @@
 package board;
 
 
+import java.util.ArrayList;
+
 /**
  * Abstract class to represent common functionality of all chess pieces
  */
@@ -8,6 +10,8 @@ public abstract class Piece {
     String type;
     boolean isWhite;
     public int row, col;
+    protected boolean firstMove;
+    Board board;
 
     /**
      * Constructor
@@ -21,6 +25,7 @@ public abstract class Piece {
         this.isWhite = isWhiteIn;
         this.col = col;
         this.row = row;
+        this.firstMove = true;
     }
 
     public String getType() {
@@ -41,6 +46,8 @@ public abstract class Piece {
 
     public abstract boolean canMove(int targetCol, int targetRow);
 
+    public abstract ArrayList<int[]> legalMoves();
+
     public void setRow(int row) {
         this.row = row;
     }
@@ -57,4 +64,11 @@ public abstract class Piece {
         return this.col;
     }
 
+    public boolean getOppositeColor() {
+        return !this.isWhite;
+    }
+
+    public boolean isWithinBounds(int row, int col) {
+        return row >= 0 && row <8 && col >= 0 && col < 8;
+    }
 }
