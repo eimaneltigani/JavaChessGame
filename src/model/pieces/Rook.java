@@ -5,6 +5,13 @@ import model.Piece;
 import java.util.ArrayList;
 
 public class Rook extends Piece {
+    int[][] directions = {
+            {-1, 0}, // Up
+            {1, 0},  // Down
+            {0, -1}, // Left
+            {0, 1}   // Right
+    };
+
     public Rook(boolean isWhite, int col, int row) {
         super("rook", isWhite, col, row);
     }
@@ -16,6 +23,37 @@ public class Rook extends Piece {
 
     @Override
     public ArrayList<int[]> legalMoves(Board board) {
-        return null;
+        ArrayList<int[]> legalMoves = new ArrayList<>();
+        int currRow = this.row;
+        int currCol = this.col;
+
+        // Iterate in each direction until blocked
+        for (int[] direction : directions) {
+            int nextRow = currRow + direction[0];
+            int nextCol = currCol + direction[1];
+
+            while (isWithinBounds(nextRow, nextCol)) {
+                Piece targetPiece = board.findPieceByLocation(nextRow, nextCol);
+
+                if (targetPiece == null) {
+                    // Empty square, add to legal moves
+                    legalMoves.add(new int[]{nextRow, nextCol});
+                } else {
+                    // Square occupied by a piece
+                    if (targetPiece.isWhite() == getOppositeColor()) {
+                        // Opponent's piece can be captured
+                        legalMoves.add(new int[]{nextRow, nextCol});
+                    }
+                    // Break once we've encountered a piece
+                    break;
+                }
+
+                // Move next step in  current direction
+                nextRow += direction[0];
+                nextCol += direction[1];
+            }
+        }
+
+        return legalMoves;
     }
 }

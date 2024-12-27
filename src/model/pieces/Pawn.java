@@ -43,10 +43,11 @@ public class Pawn extends Piece {
         // check capture moves (diagonal left and right)
         int[] captureCols = {currCol -1, currCol+1};
         for (int col : captureCols) {
-            Piece potentialCapture = board.findPieceByLocation(nextRow,col);
-            if(isWithinBounds(nextRow, col) && potentialCapture!=null
-                    && potentialCapture.isWhite() == getOppositeColor()) {
-                legalMoves.add(new int[]{nextRow, col});
+            if(isWithinBounds(nextRow,col)) {
+                Piece potentialCapture = board.findPieceByLocation(nextRow,col);
+                if(potentialCapture!=null && potentialCapture.isWhite() == getOppositeColor()) {
+                    legalMoves.add(new int[]{nextRow, col});
+                }
             }
         }
 

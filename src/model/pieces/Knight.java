@@ -9,6 +9,17 @@ import java.util.ArrayList;
  * and then one square perpendicular to that.
  */
 public class Knight extends Piece {
+    int[][] directions = {
+            {-2,-1},
+            {-2,1},
+            {-1,-2},
+            {-1,2},
+            {1,-2},
+            {1,2},
+            {2,-1},
+            {2, 1}
+    };
+
     public Knight(boolean isWhite, int col, int row) {
         super("knight", isWhite, col, row);
     }
@@ -24,24 +35,12 @@ public class Knight extends Piece {
         int currRow = this.row;
         int currCol = this.col;
 
-        // Define all possible moves for a Knight (L-shaped moves)
-        int[][] potentialMoves = {
-                {currRow - 2, currCol - 1},
-                {currRow - 2, currCol + 1},
-                {currRow - 1, currCol - 2},
-                {currRow - 1, currCol + 2},
-                {currRow + 1, currCol - 2},
-                {currRow + 1, currCol + 2},
-                {currRow + 2, currCol - 1},
-                {currRow + 2, currCol + 1}
-        };
-
         // Check each potential move
-        for (int[] move : potentialMoves) {
-            int targetRow = move[0];
-            int targetCol = move[1];
+        for (int[] direction : directions) {
+            int targetRow = currRow + direction[0];
+            int targetCol = currCol + direction[1];
 
-            // Ensure the move is within bounds
+            // Ensure move is within bounds
             if (isWithinBounds(targetRow, targetCol)) {
                 Piece targetPiece = board.findPieceByLocation(targetRow, targetCol);
 
