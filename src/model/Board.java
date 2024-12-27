@@ -1,6 +1,6 @@
-package board;
+package model;
 
-import pieces.*;
+import model.pieces.*;
 
 import java.util.ArrayList;
 
@@ -9,16 +9,15 @@ import java.util.ArrayList;
  * Game board data structure.
  */
 public class Board {
-    public static Piece[][] board;
-    ArrayList<Piece> allPieces;
-    ArrayList<Piece> whitePieces;
-    ArrayList<Piece> blackPieces;
-
-    ArrayList<Piece> capturedPieces;
+    private Piece[][] board;
+    private ArrayList<Piece> allPieces;
+    private ArrayList<Piece> whitePieces;
+    private ArrayList<Piece> blackPieces;
+    private ArrayList<Piece> capturedPieces;
 
 
     /**
-     * Constructor. Initializes board to class chess start position
+     * Constructor.
      */
     public Board() {
         board = new Piece[8][8]; // Define chess board as 2D array
@@ -81,16 +80,16 @@ public class Board {
         board [0][5] = new Bishop(black,0,5);
         board [0][6] = new Knight(black,0,6);
         board [0][7] = new Rook(black,0,7);
-
     }
 
     /**
-     * Adds all of each team's pieces to their respective list
+     * Adds all of each team's model pieces to their respective list
      */
     public void populateLists() {
         allPieces = new ArrayList<>();
         whitePieces = new ArrayList<>();
         blackPieces = new ArrayList<>();
+        capturedPieces = new ArrayList<>();
 
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
@@ -108,16 +107,21 @@ public class Board {
         }
     }
 
-    public static Piece findPieceByLocation(int row, int col) {
+    public Piece findPieceByLocation(int row, int col) {
         return board[row][col];
     }
 
-    public void movePiece(Piece p, int targetRow, int targetCol) {
-        int currRow = p.getRow();
-        int currCol = p.getCol();
+    public void movePiece(Move move) {
+        Piece p = move.getPiece();
+        int currRow = move.getCurrRow();
+        int currCol = move.getCurrCol();
 
-        // if capturing piece, update pieces array
-        if(board[targetRow][targetCol]!=null) {
+        int targetRow = move.getTargetRow();
+        int targetCol = move.getTargetCol();
+        boolean captured = move.isCaptured;
+
+        // if capturing piece, update flag and array lists
+        if(captured) {
             Piece capturedPiece = board[targetRow][targetCol];
             if(capturedPiece.isWhite()) {
                 whitePieces.remove(capturedPiece);
@@ -127,12 +131,15 @@ public class Board {
             capturedPieces.add(capturedPiece);
             allPieces.remove(capturedPiece);
         }
+
         // update Piece coordinates
         p.setRow(targetRow);
         p.setCol(targetCol);
-        //update board
+
+        // update board
         board[targetRow][targetCol] = board[currRow][currCol];
         board[currRow][currCol] = null;
+
     }
 
     public void copyBoard(ArrayList<Piece> source, ArrayList<Piece> target) {
@@ -142,12 +149,12 @@ public class Board {
         }
     }
 
-    public Piece[][] getBoard() {
-        return board;
-    }
-
     public void setBoard(Piece[][] board) {
         this.board = board;
+    }
+
+    public Piece[][] getBoard() {
+        return board;
     }
 
     public void setAllPieces(ArrayList<Piece> allPieces) {
@@ -156,6 +163,30 @@ public class Board {
 
     public ArrayList<Piece> getAllPieces() {
         return allPieces;
+    }
+
+    public void setWhitePieces(ArrayList<Piece> whitePieces) {
+        this.whitePieces = whitePieces;
+    }
+
+    public ArrayList<Piece> getWhitePieces() {
+        return whitePieces;
+    }
+
+    public void setBlackPieces(ArrayList<Piece> blackPieces) {
+        this.blackPieces = blackPieces;
+    }
+
+    public ArrayList<Piece> getBlackPieces() {
+        return blackPieces;
+    }
+
+    public void setCapturedPieces(ArrayList<Piece> capturedPieces) {
+        this.capturedPieces = capturedPieces;
+    }
+
+    public ArrayList<Piece> getCapturedPieces() {
+        return capturedPieces;
     }
 
 }

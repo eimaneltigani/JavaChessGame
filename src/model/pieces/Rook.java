@@ -1,6 +1,6 @@
-package pieces;
-import board.Board;
-import board.Piece;
+package model.pieces;
+import model.Board;
+import model.Piece;
 
 import java.util.ArrayList;
 
@@ -15,7 +15,7 @@ public class Rook extends Piece {
     }
 
     @Override
-    public ArrayList<int[]> legalMoves() {
+    public ArrayList<int[]> legalMoves(Board board) {
         return null;
     }
 }

@@ -1,6 +1,6 @@
-package pieces;
-import board.Board;
-import board.Piece;
+package model.pieces;
+import model.Board;
+import model.Piece;
 
 import java.util.ArrayList;
 
@@ -22,20 +22,20 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public ArrayList<int[]> legalMoves() {
+    public ArrayList<int[]> legalMoves(Board board) {
         ArrayList<int[]> legalMoves= new ArrayList<>();
         int currRow = this.row;
         int currCol = this.col;
 
         // Normal forward move
         int nextRow = currRow + direction;
-        if(isWithinBounds(nextRow, currCol) && Board.findPieceByLocation(nextRow,currCol)==null) {
+        if(isWithinBounds(nextRow, currCol) && board.findPieceByLocation(nextRow,currCol)==null) {
             legalMoves.add(new int[]{nextRow, currCol});
 
             // Starting position move (only if first square is empty)
             int twoStepRow = currRow + 2 * direction;
             if (firstMove && isWithinBounds(twoStepRow, currCol)
-                    && (Board.findPieceByLocation(nextRow, currCol) == null)) {
+                    && (board.findPieceByLocation(nextRow, currCol) == null)) {
                     legalMoves.add(new int[]{twoStepRow, currCol});
             }
         }
@@ -43,7 +43,7 @@ public class Pawn extends Piece {
         // check capture moves (diagonal left and right)
         int[] captureCols = {currCol -1, currCol+1};
         for (int col : captureCols) {
-            Piece potentialCapture = Board.findPieceByLocation(nextRow,col);
+            Piece potentialCapture = board.findPieceByLocation(nextRow,col);
             if(isWithinBounds(nextRow, col) && potentialCapture!=null
                     && potentialCapture.isWhite() == getOppositeColor()) {
                 legalMoves.add(new int[]{nextRow, col});

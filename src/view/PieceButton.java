@@ -1,6 +1,6 @@
-package main;
+package view;
 
-import board.Piece;
+import model.Piece;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -30,14 +30,15 @@ public class PieceButton extends JButton {
     }
 
     public void setPiece(Piece p) {
-        piece = p;
+        this.piece = p;
         if (p==null) {
             isEmpty = true;
+            image = null; // clear image
         } else {
             isEmpty = false;
             char colorChar = p.isWhite() ? 'w' : 'b';
             String imagePath = MessageFormat.format("/piece/{0}-{1}", colorChar, p.getType());
-            this.image = getImage(imagePath);
+            image = getImage(imagePath);
         }
 
         repaint(); // Request re-rendering to display the piece
