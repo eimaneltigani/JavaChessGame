@@ -120,7 +120,7 @@ public class Board {
         int targetCol = move.getTargetCol();
         boolean captured = move.isCaptured;
 
-        // if capturing piece, update flag and array lists
+        // if capturing piece, update array lists
         if(captured) {
             Piece capturedPiece = board[targetRow][targetCol];
             if(capturedPiece.isWhite()) {
@@ -140,11 +140,9 @@ public class Board {
             p.setFirstMove();
         }
 
-
         // update board
         board[targetRow][targetCol] = board[currRow][currCol];
         board[currRow][currCol] = null;
-
     }
 
     public void copyBoard(ArrayList<Piece> source, ArrayList<Piece> target) {
