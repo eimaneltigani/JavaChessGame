@@ -144,9 +144,7 @@ public class Board {
 
     public void copyBoard(ArrayList<Piece> source, ArrayList<Piece> target) {
         target.clear();
-        for (int i = 0; i < source.size(); i++) {
-            target.add(source.get(i));
-        }
+        target.addAll(source);
     }
 
     public void setBoard(Piece[][] board) {
