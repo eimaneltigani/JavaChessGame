@@ -4,6 +4,9 @@ import model.Piece;
 
 import java.util.ArrayList;
 
+/**
+ * Rook rules - Moves any number of squares horizontally or vertically
+ */
 public class Rook extends Piece {
     int[][] directions = {
             {-1, 0}, // Up

@@ -5,7 +5,7 @@ import model.Piece;
 import java.util.ArrayList;
 
 /**
- * Pawn rules - moves one square forward, but on its first move, it can move
+ * Pawn rules - Moves one square forward, but on its first move, it can move
  * two squares forward. It captures diagonally one square forward.
  */
 public class Pawn extends Piece {
