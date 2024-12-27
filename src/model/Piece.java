@@ -67,6 +67,14 @@ public abstract class Piece {
         return !this.isWhite;
     }
 
+    public void setFirstMove() {
+        firstMove = false;
+    }
+
+    public boolean getFirstMove() {
+        return firstMove;
+    }
+
     public boolean isWithinBounds(int row, int col) {
         return row >= 0 && row <8 && col >= 0 && col < 8;
     }

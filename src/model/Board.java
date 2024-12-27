@@ -135,6 +135,11 @@ public class Board {
         // update Piece coordinates
         p.setRow(targetRow);
         p.setCol(targetCol);
+        // set first move to false if so
+        if(p.getFirstMove()) {
+            p.setFirstMove();
+        }
+
 
         // update board
         board[targetRow][targetCol] = board[currRow][currCol];
