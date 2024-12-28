@@ -36,9 +36,7 @@ public class PieceButton extends JButton {
             image = null; // clear image
         } else {
             isEmpty = false;
-            char colorChar = p.isWhite() ? 'w' : 'b';
-            String imagePath = MessageFormat.format("/piece/{0}-{1}", colorChar, p.getType());
-            image = getImage(imagePath);
+            image = p.image;
         }
 
         repaint(); // Request re-rendering to display the piece
@@ -56,19 +54,6 @@ public class PieceButton extends JButton {
     public void removeHighlight() {
         this.backgroundColor = tileColor;
         repaint(); // Request re-rendering to apply the new background
-    }
-
-    public BufferedImage getImage(String imagePath) {
-
-        BufferedImage image = null;
-
-        try {
-            image = ImageIO.read(getClass().getResourceAsStream(imagePath + ".png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return image;
     }
 
     @Override

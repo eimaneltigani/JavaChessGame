@@ -1,6 +1,10 @@
 package model;
 
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 
 /**
@@ -11,6 +15,7 @@ public abstract class Piece {
     boolean isWhite;
     public int row, col;
     protected boolean firstMove;
+    public BufferedImage image;
 
     /**
      * Constructor
@@ -25,6 +30,22 @@ public abstract class Piece {
         this.col = col;
         this.row = row;
         this.firstMove = true;
+        char colorChar = isWhite ? 'w' : 'b';
+        String imagePath = MessageFormat.format("/piece/{0}-{1}", colorChar, typeIn);
+        this.image = getImage(imagePath);
+    }
+
+    public BufferedImage getImage(String imagePath) {
+
+        BufferedImage image = null;
+
+        try {
+            image = ImageIO.read(getClass().getResourceAsStream(imagePath + ".png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return image;
     }
 
     public abstract boolean canMove(int targetCol, int targetRow);

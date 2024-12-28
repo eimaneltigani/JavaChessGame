@@ -72,7 +72,7 @@ public class ChessGUI implements ActionListener {
         boardPanel = new JPanel(new GridLayout(8, 8));
         configureBoardPanel();
 
-        sidePanel = new JPanel();
+        sidePanel = new JPanel(new GridLayout(2,1));
         configureSidePanel();
 
         gamePanel.add(boardPanel, BorderLayout.WEST);
@@ -107,10 +107,57 @@ public class ChessGUI implements ActionListener {
     public void configureSidePanel() {
         sidePanel.setPreferredSize(new Dimension(300,800));
         sidePanel.setBackground(Color.GRAY);
+
+        // Top side panel displays current users turn
+        playerPanel = new JPanel();
+        playerPanel.setPreferredSize(new Dimension(300,200));
+
+        // Lower side panel displays captured pieces
+        piecePanel = new JPanel();
+        piecePanel.setPreferredSize(new Dimension(300,600));
+        piecePanel.setLayout(new GridLayout(2,1));
+
+        sidePanel.add(playerPanel);
+        sidePanel.add(piecePanel);
+
     }
 
-    public void updateSidePanel(ArrayList<Piece> capturedPieces) {
+    public void updatePiecePanel(ArrayList<Piece> capturedPieces) {
         // should be updated after each kill
+        JPanel whitePanel1 = new JPanel();
+        whitePanel1.setLayout(new BoxLayout(whitePanel1, BoxLayout.Y_AXIS));
+        JPanel blackPanel1 = new JPanel();
+        blackPanel1.setLayout(new BoxLayout(blackPanel1, BoxLayout.Y_AXIS));
+
+        ArrayList<Piece> capturedWhite = new ArrayList<>();
+        ArrayList<Piece> capturedBlack = new ArrayList<>();
+
+        for (Piece p : capturedPieces) {
+            if(p.isWhite()) {
+                capturedWhite.add(p);
+            } else {
+                capturedBlack.add(p);
+            }
+        }
+
+        for(Piece p : capturedWhite) {
+            ImageIcon imageIcon = new ImageIcon(p.image);
+            JLabel label = new JLabel(imageIcon);
+            whitePanel1.add(label);
+        }
+
+        for(Piece p : capturedBlack) {
+            ImageIcon imageIcon = new ImageIcon(p.image);
+            JLabel label = new JLabel(imageIcon);
+            blackPanel1.add(label);
+        }
+
+        piecePanel.removeAll();
+        piecePanel.add(whitePanel1);
+        piecePanel.add(blackPanel1);
+
+        piecePanel.repaint();
+        piecePanel.revalidate();
     }
 
     // called as first update when model is created

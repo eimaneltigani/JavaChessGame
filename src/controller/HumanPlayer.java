@@ -81,9 +81,9 @@ public class HumanPlayer implements Player, ClickListener {
 
         // update captured panel
         if(move.isCaptured()) {
-            System.out.println("piece was captured");
+            System.out.println("captured piece!");
+            gui.updatePiecePanel(b.getCapturedPieces());
         }
-
 
     }
 
