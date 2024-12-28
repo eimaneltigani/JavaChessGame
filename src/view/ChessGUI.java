@@ -45,7 +45,7 @@ public class ChessGUI implements ActionListener {
         int row = clickedButton.row;
         int col = clickedButton.col;
         boolean captured = false;
-        if(clickedButton.getPiece()!=null && clickedButton.getPiece().isWhite()==false) {
+        if (clickedButton.getPiece()!=null && clickedButton.getPiece().isWhite()==false) {
             captured = true;
         }
 
@@ -70,9 +70,11 @@ public class ChessGUI implements ActionListener {
         gamePanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
         boardPanel = new JPanel(new GridLayout(8, 8));
+        boardPanel.setPreferredSize(new Dimension(800,800));
         configureBoardPanel();
 
-        sidePanel = new JPanel(new GridLayout(2,1));
+        sidePanel = new JPanel(new BorderLayout());
+        sidePanel.setPreferredSize(new Dimension(300,800));
         configureSidePanel();
 
         gamePanel.add(boardPanel, BorderLayout.WEST);
@@ -87,8 +89,6 @@ public class ChessGUI implements ActionListener {
 
     // set buttons and background color for board tiles
     public void configureBoardPanel() {
-        boardPanel.setPreferredSize(new Dimension(800,800));
-
         boolean isWhite = true;
         for (int row = 0; row < MAX_ROW; row++) {
             for (int col = 0; col < MAX_COL; col++) {
@@ -105,20 +105,19 @@ public class ChessGUI implements ActionListener {
     }
 
     public void configureSidePanel() {
-        sidePanel.setPreferredSize(new Dimension(300,800));
-        sidePanel.setBackground(Color.GRAY);
 
         // Top side panel displays current users turn
         playerPanel = new JPanel();
         playerPanel.setPreferredSize(new Dimension(300,200));
+        playerPanel.setBackground(Color.GRAY);
 
         // Lower side panel displays captured pieces
         piecePanel = new JPanel();
         piecePanel.setPreferredSize(new Dimension(300,600));
-        piecePanel.setLayout(new GridLayout(2,1));
+        piecePanel.setLayout(new GridLayout(1,2));
 
-        sidePanel.add(playerPanel);
-        sidePanel.add(piecePanel);
+        sidePanel.add(playerPanel, BorderLayout.NORTH);
+        sidePanel.add(piecePanel, BorderLayout.SOUTH);
 
     }
 
@@ -230,6 +229,5 @@ public class ChessGUI implements ActionListener {
             button.setEnabled(false);
         }
     }
-
 
 }

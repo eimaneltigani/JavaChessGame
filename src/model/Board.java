@@ -14,7 +14,7 @@ public class Board {
     private ArrayList<Piece> whitePieces;
     private ArrayList<Piece> blackPieces;
     private ArrayList<Piece> capturedPieces;
-
+    Move lastMove;
 
     /**
      * Constructor.
@@ -143,6 +143,32 @@ public class Board {
         // update board
         board[targetRow][targetCol] = board[currRow][currCol];
         board[currRow][currCol] = null;
+
+        // save last move
+        lastMove = move;
+    }
+
+    public void undoLastMove() {
+        int prevRow = lastMove.currRow;
+        int prevCol = lastMove.currCol;
+        int currRow = lastMove.getTargetRow();
+        int currCol = lastMove.getTargetCol();
+        Piece movedPiece = lastMove.getPiece();
+        Piece capturedPiece = null;
+        if (lastMove.isCaptured()) {
+            capturedPiece = capturedPieces.get(capturedPieces.size()-1);
+            // update lists
+            capturedPieces.remove(capturedPieces.size()-1);
+            allPieces.add(capturedPiece);
+            if(capturedPiece.isWhite()) {
+                whitePieces.add(capturedPiece);
+            } else {
+                blackPieces.add(capturedPiece);
+            }
+        }
+
+        board[currRow][currCol] = capturedPiece;
+        board[prevRow][prevCol] = movedPiece;
     }
 
     public void copyBoard(ArrayList<Piece> source, ArrayList<Piece> target) {

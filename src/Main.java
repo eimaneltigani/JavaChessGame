@@ -13,7 +13,7 @@ public class Main {
         p2.initializeBoard(board);
         Player currPlayer = p1;
 
-        while(true) {
+        while (true) {
             Move move = currPlayer.decideMove(board);
             currPlayer.update(board, move);
 
