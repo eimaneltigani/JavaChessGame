@@ -3,6 +3,7 @@ package model;
 import model.pieces.*;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 
 /**
@@ -13,8 +14,8 @@ public class Board {
     private ArrayList<Piece> allPieces;
     private ArrayList<Piece> whitePieces;
     private ArrayList<Piece> blackPieces;
-    private ArrayList<Piece> capturedPieces;
-    Move lastMove;
+    private Stack<Piece> capturedPieces = new Stack<>();;
+    private Stack<Move> lastMoves = new Stack<>();;
 
     /**
      * Constructor.
@@ -89,7 +90,6 @@ public class Board {
         allPieces = new ArrayList<>();
         whitePieces = new ArrayList<>();
         blackPieces = new ArrayList<>();
-        capturedPieces = new ArrayList<>();
 
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
@@ -145,10 +145,15 @@ public class Board {
         board[currRow][currCol] = null;
 
         // save last move
-        lastMove = move;
+        lastMoves.add(move);
     }
 
     public void undoLastMove() {
+        if(lastMoves.isEmpty()) {
+            return;
+        }
+
+        Move lastMove = lastMoves.pop();
         int prevRow = lastMove.currRow;
         int prevCol = lastMove.currCol;
         int currRow = lastMove.getTargetRow();
@@ -156,9 +161,8 @@ public class Board {
         Piece movedPiece = lastMove.getPiece();
         Piece capturedPiece = null;
         if (lastMove.isCaptured()) {
-            capturedPiece = capturedPieces.get(capturedPieces.size()-1);
+            capturedPiece = capturedPieces.pop();
             // update lists
-            capturedPieces.remove(capturedPieces.size()-1);
             allPieces.add(capturedPiece);
             if(capturedPiece.isWhite()) {
                 whitePieces.add(capturedPiece);
@@ -166,6 +170,8 @@ public class Board {
                 blackPieces.add(capturedPiece);
             }
         }
+
+        // need to add extra steps in case it was an elements first move
 
         board[currRow][currCol] = capturedPiece;
         board[prevRow][prevCol] = movedPiece;
