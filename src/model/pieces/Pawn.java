@@ -22,7 +22,7 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public ArrayList<int[]> legalMoves(Board board) {
+    public ArrayList<int[]> availableMoves(Board board) {
         ArrayList<int[]> legalMoves= new ArrayList<>();
         int currRow = this.row;
         int currCol = this.col;

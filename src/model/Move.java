@@ -12,13 +12,12 @@ public class Move {
     int targetRow, targetCol;
     boolean isCaptured;
 
-    public Move(Piece piece, int targetRow, int targetCol, boolean captured) {
+    public Move(Piece piece, int targetRow, int targetCol) {
         this.piece = piece;
         this.currRow = piece.getRow();
         this.currCol = piece.getCol();
         this.targetRow = targetRow;
         this.targetCol = targetCol;
-        this.isCaptured = captured;
     }
 
     public Piece getPiece() {
@@ -41,6 +40,9 @@ public class Move {
         return targetCol;
     }
 
+    public void setCaptured(boolean captured) {
+        this.isCaptured = captured;
+    }
     public boolean isCaptured() {
         return isCaptured;
     }

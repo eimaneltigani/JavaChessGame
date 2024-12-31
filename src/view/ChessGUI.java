@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * The main view of the chess game.
@@ -96,6 +97,7 @@ public class ChessGUI implements ActionListener {
                 PieceButton b = new PieceButton(row, col, color);
                 buttons[row][col] = b;
                 b.addActionListener(this);
+                b.setEnabled(false);
                 boardPanel.add(b);
 
                 isWhite = !isWhite; // Alternate color
@@ -185,11 +187,14 @@ public class ChessGUI implements ActionListener {
 
 
     // called when users turn, enable clicks on user pieces
-    public void enableUserClicks(ArrayList<Piece> availablePieces) {
-        for (Piece p : availablePieces) {
+    public void enableUserClicks(HashMap<Piece, ArrayList<int[]>> availablePieces) {
+        for (Piece p : availablePieces.keySet()) {
+            ArrayList<int[]> movesForPiece = availablePieces.get(p);
             int row = p.getRow();
             int col = p.getCol();
-            buttons[row][col].setEnabled(true);
+            if(!movesForPiece.isEmpty()) {
+                buttons[row][col].setEnabled(true);
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import view.ChessGUI;
 import view.ChessGUI.ClickListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class HumanPlayer implements Player, ClickListener {
     ChessGUI gui;
@@ -30,7 +31,8 @@ public class HumanPlayer implements Player, ClickListener {
         selectedPiece = null;
 
         // enable clicks for user pieces
-        ArrayList<Piece> availablePiecesToMove = board.getWhitePieces();
+        HashMap<Piece, ArrayList<int[]>> availablePiecesToMove = board.getAvailableMoves(true);
+        System.out.println(availablePiecesToMove);
         gui.enableUserClicks(availablePiecesToMove);
 
         // wait until user finishes decision
@@ -52,20 +54,20 @@ public class HumanPlayer implements Player, ClickListener {
         Piece piece = board.findPieceByLocation(row, col);
 
         // If selecting piece for first time
-        if (selectedPiece == null) {
+        if (selectedPiece == null && piece.isWhite()) {
             selectedPiece = piece;
-            legalMoves = selectedPiece.legalMoves(board);
+            legalMoves = selectedPiece.availableMoves(board);
             gui.highlightLegalMoves(legalMoves);
 
         } else if (piece!= null && piece.isWhite()) {
             // if user is selecting another piece to move
             gui.removeHighlight(legalMoves);
             selectedPiece = piece;
-            legalMoves = selectedPiece.legalMoves(board);
+            legalMoves = selectedPiece.availableMoves(board);
             gui.highlightLegalMoves(legalMoves);
         } else {
 
-            currentMove = new Move(selectedPiece, row, col, captured);
+            currentMove = new Move(selectedPiece, row, col);
         }
     }
 

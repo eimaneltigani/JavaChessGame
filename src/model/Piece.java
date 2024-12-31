@@ -50,7 +50,7 @@ public abstract class Piece {
 
     public abstract boolean canMove(int targetCol, int targetRow);
 
-    public abstract ArrayList<int[]> legalMoves(Board board);
+    public abstract ArrayList<int[]> availableMoves(Board board);
 
     public String getType() {
         return type;

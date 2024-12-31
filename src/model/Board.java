@@ -32,7 +32,7 @@ public class Board {
     /**
      * Initializes board to classic chess start position
      */
-    public void initializeBoard() {
+    private void initializeBoard() {
 
         /*
          * (row,col)
@@ -91,7 +91,7 @@ public class Board {
     /**
      * Adds all of each team's model pieces to their respective list
      */
-    public void populateLists() {
+    private void populateLists() {
         allPieces = new ArrayList<>();
         whitePieces = new ArrayList<>();
         blackPieces = new ArrayList<>();
@@ -124,10 +124,10 @@ public class Board {
 
         int targetRow = move.getTargetRow();
         int targetCol = move.getTargetCol();
-        boolean captured = move.isCaptured;
 
         // if capturing piece, update array lists
-        if(captured) {
+        if(board[targetRow][targetCol] != null) {
+            move.setCaptured(true);
             Piece capturedPiece = board[targetRow][targetCol];
             if(capturedPiece.isWhite()) {
                 whitePieces.remove(capturedPiece);
@@ -172,17 +172,38 @@ public class Board {
 
     }
 
-//    public HashMap<Piece, ArrayList<int[]>> getAvailableMoves(boolean color) {
-//        HashMap<Piece, ArrayList<int[]>> map = new HashMap<>();
-//        ArrayList<Piece> playerPieces = color ? whitePieces : blackPieces;
-//
-//        for (Piece p : playerPieces) {
-//            ArrayList<int[]> legalMoves = p.legalMoves(this);
-//            if (!legalMoves.isEmpty()) {
-//                // check if move doesn't jeapordize king
-//            }
-//        }
-//    }
+    public HashMap<Piece, ArrayList<int[]>> getAvailableMoves(boolean color) {
+        HashMap<Piece, ArrayList<int[]>> map = new HashMap<>();
+        ArrayList<Piece> playerPieces = color ? whitePieces : blackPieces;
+
+        for (Piece p : playerPieces) {
+
+            ArrayList<int[]> legalMoves = new ArrayList<>();
+            ArrayList<int[]> pseudoLegalMoves = p.availableMoves(this);
+            for (int[] move : pseudoLegalMoves) {
+                if (!putsKingInDanger(p, move[0], move[1])) {
+                    legalMoves.add(move);
+                }
+            }
+
+            map.put(p, legalMoves);
+        }
+
+        return map;
+    }
+
+    private boolean putsKingInDanger(Piece p, int targetRow, int targetCol) {
+        // simulate move
+        movePiece(new Move(p, targetRow, targetCol));
+
+        if(inCheck(p.isWhite())) {
+            return true;
+        }
+        // undo move
+        undoLastMove();
+
+        return false;
+    }
 
     public void undoLastMove() {
         if(lastMoves.isEmpty()) {
@@ -238,7 +259,20 @@ public class Board {
                 movedPiece.setFirstMove(true);
             }
         }
+    }
 
+    public boolean inCheck(boolean isWhite) {
+        King currKing = isWhite ? whiteKing : blackKing;
+        int[] kingLocation = new int[]{currKing.getRow(), currKing.getCol()};
+        ArrayList<Piece> oppositePieces = isWhite ? blackPieces : whitePieces;
+        for(Piece opp : oppositePieces) {
+            ArrayList<int[]> potentialMoves = opp.availableMoves(this);
+            if(potentialMoves.contains(kingLocation)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void copyBoard(ArrayList<Piece> source, ArrayList<Piece> target) {
