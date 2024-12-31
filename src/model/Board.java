@@ -168,16 +168,18 @@ public class Board {
         // save last move
         lastMoves.add(move);
 
-        // check if move puts opposite king in check
-
+//        // check if move puts opposite king in check
+//        if(inCheck(!p.isWhite())) {
+//            King oppositKing = p.isWhite() ? blackKing : whiteKing;
+//            oppositKing.markCheck(true);
+//        }
     }
 
-    public HashMap<Piece, ArrayList<int[]>> getAvailableMoves(boolean color) {
+    public HashMap<Piece, ArrayList<int[]>> getAllPossibleMoves(boolean color) {
         HashMap<Piece, ArrayList<int[]>> map = new HashMap<>();
         ArrayList<Piece> playerPieces = color ? whitePieces : blackPieces;
 
         for (Piece p : playerPieces) {
-
             ArrayList<int[]> legalMoves = new ArrayList<>();
             ArrayList<int[]> pseudoLegalMoves = p.availableMoves(this);
             for (int[] move : pseudoLegalMoves) {
@@ -191,6 +193,7 @@ public class Board {
 
         return map;
     }
+
 
     private boolean putsKingInDanger(Piece p, int targetRow, int targetCol) {
         // simulate move
@@ -270,6 +273,14 @@ public class Board {
             if(potentialMoves.contains(kingLocation)) {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    public boolean isCheckMate(boolean color) {
+        if(inCheck(color)) {
+            return getAllPossibleMoves(color).isEmpty();
         }
 
         return false;

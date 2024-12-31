@@ -31,8 +31,7 @@ public class HumanPlayer implements Player, ClickListener {
         selectedPiece = null;
 
         // enable clicks for user pieces
-        HashMap<Piece, ArrayList<int[]>> availablePiecesToMove = board.getAvailableMoves(true);
-        System.out.println(availablePiecesToMove);
+        HashMap<Piece, ArrayList<int[]>> availablePiecesToMove = board.getAllPossibleMoves(true);
         gui.enableUserClicks(availablePiecesToMove);
 
         // wait until user finishes decision

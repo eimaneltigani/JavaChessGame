@@ -93,7 +93,7 @@ public class King extends Piece {
         return true;
     }
 
-    public void setInCheck(boolean inCheck) {
+    public void markCheck(boolean inCheck) {
         this.inCheck = inCheck;
     }
 
