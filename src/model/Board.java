@@ -119,6 +119,7 @@ public class Board {
 
     public void movePiece(Move move) {
         Piece p = move.getPiece();
+        boolean color = p.isWhite();
         int currRow = move.getCurrRow();
         int currCol = move.getCurrCol();
 
@@ -158,6 +159,23 @@ public class Board {
 
             board[currRow][rookTargetCol] = rook;
             board[currRow][rookCurrCol] = null;
+        }
+        // need to add some handling for pawn promotion
+        // can decide once figure out how that could be handled
+        // on computer side
+        if(p instanceof Pawn) {
+            if(p.isWhite() && p.getRow() == 0) {
+                // let user pick
+                System.out.println("hey girl go get that pawn promotion");
+            } else if (!p.isWhite() && p.getRow() == 7) {
+                // if computer, will always pick queen
+                // remove Pawn from lists
+                // xxxxx
+                p = new Queen(color, targetCol, targetRow);
+
+
+
+            }
         }
 
 
@@ -230,6 +248,8 @@ public class Board {
             } else {
                 blackPieces.add(capturedPiece);
             }
+
+            capturedPieces.remove(capturedPiece);
         }
 
         board[currRow][currCol] = capturedPiece;
@@ -257,6 +277,9 @@ public class Board {
             }
         }
 
+
+        // xxxxxxxxxxxxxxxx
+        // need to update to be more specific to color bc could apply to pawn promotion
         if(movedPiece instanceof Pawn) {
             if(prevRow == 1 || prevRow == 6) {
                 movedPiece.setFirstMove(true);
