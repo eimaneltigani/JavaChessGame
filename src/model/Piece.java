@@ -88,11 +88,11 @@ public abstract class Piece {
         return !this.isWhite;
     }
 
-    public void setFirstMove() {
-        firstMove = false;
+    public void setFirstMove(boolean b) {
+        firstMove = b;
     }
 
-    public boolean getFirstMove() {
+    public boolean isFirstMove() {
         return firstMove;
     }
 

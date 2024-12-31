@@ -1,5 +1,6 @@
 package model.pieces;
 import model.Board;
+import model.Move;
 import model.Piece;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class King extends Piece {
             {1, -1},  // Bottom-left
             {1, 1}    // Bottom-right
     };
+    boolean inCheck = false;
 
     public King(boolean isWhite, int col, int row) {
         super("king", isWhite, col, row);
@@ -49,6 +51,54 @@ public class King extends Piece {
             }
         }
 
+        // Check for castling
+        if(this.isFirstMove()) {
+            // Check Kingside castling
+            if(canCastle(board, true)) {
+                int newCol = currCol + 2;
+                legalMoves.add(new int[]{currRow, newCol});
+            }
+
+            // Check Queenside castling
+            if(canCastle(board, false)) {
+                int newCol = currCol - 2;
+                legalMoves.add(new int[]{currRow, newCol});
+            }
+        }
+
         return legalMoves;
     }
+
+    // Castling rules - permitted only if neither king nor rook have previously moved
+    // and squares between are vacant
+    private boolean canCastle(Board board, boolean kingside) {
+        int rookCol = kingside ? 7 : 0;
+        int direction = kingside ? 1 : -1;
+
+        // Check if rook hasn't moved
+        Piece rook = board.findPieceByLocation(row, rookCol);
+        if(!(rook instanceof Rook) || !rook.isFirstMove()) {
+            return false;
+        }
+
+        // Check that all squares between king & rook are empty
+        int currCol = col + direction;
+        while(currCol != rookCol) {
+            if(board.findPieceByLocation(row,currCol) != null) {
+                return false;
+            }
+            currCol += direction;
+        }
+
+        return true;
+    }
+
+    public void setInCheck(boolean inCheck) {
+        this.inCheck = inCheck;
+    }
+
+    public boolean inCheck() {
+        return inCheck;
+    }
+
 }
