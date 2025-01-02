@@ -3,10 +3,8 @@ package view;
 import model.Board;
 import model.Move;
 import model.Piece;
-import controller.Player;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,13 +17,7 @@ import java.util.HashMap;
  */
 public class ChessGUI implements ActionListener {
 
-    // GUI components and specifications
-    private static final int WIDTH = 1100;
-    private static final int HEIGHT = 800;
-    private static final int MAX_ROW = 8;
-    private static final int MAX_COL = 8;
     JFrame window;
-    JPanel gamePanel;
     JPanel boardPanel;
     JPanel sidePanel;
     JPanel playerPanel;
@@ -34,47 +26,26 @@ public class ChessGUI implements ActionListener {
     JLayeredPane layeredPane;
     PieceButton[][] buttons = new PieceButton[8][8];
     boolean promotionIsVisible = false;
-    //
     ClickListener clickListener;
 
+
+    private static final int WIDTH = 1100;
+    private static final int HEIGHT = 800;
+    private static final int MAX_ROW = 8;
+    private static final int MAX_COL = 8;
+
+    // Create separate interface to handle click actions
     public interface ClickListener {
+
         void onClick(int row, int col, boolean captured);
-
         void handlePromotionSelection(String piece);
-    }
 
-    // actionPerformed method triggered on button click
-    // delegates onClick action to class that implements ClickListener
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-        if (promotionIsVisible) {
-            JButton clickedButton = (JButton) e.getSource();
-            String buttonName = clickedButton.getText();
-            System.out.println("You clicked promotional button for: " + buttonName);
-            if (clickListener != null) {
-                clickListener.handlePromotionSelection(buttonName);
-            }
-            promotionalPanel.setVisible(false); // Hide after selection
-            promotionIsVisible = false;
-        } else {
-            PieceButton clickedButton = (PieceButton) e.getSource();
-            int row = clickedButton.row;
-            int col = clickedButton.col;
-            boolean captured = false;
-            if (clickedButton.getPiece()!=null && clickedButton.getPiece().isWhite()==false) {
-                captured = true;
-            }
-
-            if (clickListener != null) {
-                clickListener.onClick(row, col, captured);
-            }
-        }
     }
 
     /**
-     * Contructor for GUI
-     * @param clicklistener - takes in class that extends clickListener (in this case, HumanPlayer)
+     * Constructor - takes in click listener (in this case, it will be the user player) to process user input
+     * in separate class to allow controller to handle game logic
+      * @param clicklistener
      */
     public ChessGUI(ClickListener clicklistener) {
         this.clickListener = clicklistener;
@@ -90,24 +61,19 @@ public class ChessGUI implements ActionListener {
         layeredPane.setBounds(0,0,800,800);
 
         boardPanel = new JPanel(new GridLayout(8, 8, 0, 0));
-        boardPanel.setPreferredSize(new Dimension(800,800));
         configureBoardPanel();
 
         promotionalPanel = new JPanel();
-        promotionalPanel.setPreferredSize(new Dimension(800,300));
-        promotionalPanel.setBounds(0,250,800,300);
-        promotionalPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 50)); // Center the buttons
         configurePromotionPanel();
-        promotionalPanel.setVisible(false); // hide initially
 
         sidePanel = new JPanel(new BorderLayout());
-        sidePanel.setPreferredSize(new Dimension(300,800));
         configureSidePanel();
 
-        // add components to layered pane
+        // Add components to layered pane
         layeredPane.add(boardPanel, JLayeredPane.DEFAULT_LAYER);
         layeredPane.add(promotionalPanel, JLayeredPane.PALETTE_LAYER);
 
+        // Add everything to frame
         window.add(layeredPane, BorderLayout.WEST);
         window.add(sidePanel, BorderLayout.EAST);
         window.pack();
@@ -115,28 +81,9 @@ public class ChessGUI implements ActionListener {
         window.setVisible(true);
     }
 
-    private void configurePromotionPanel() {
-        String[] pieces = {"queen", "rook", "bishop", "knight"};
-
-        for (String piece : pieces) {
-            JButton button = new JButton();
-            button.setText(piece);
-            button.setPreferredSize(new Dimension(100,50));
-            button.setBackground(Color.DARK_GRAY);
-            button.addActionListener(this);
-            promotionalPanel.add(button);
-        }
-    }
-
-    public void showPromotion() {
-        System.out.println("user just asked to display promotion panel");
-        promotionalPanel.setVisible(true);
-        promotionIsVisible = true;
-    }
-
-
-    // set buttons and background color for board tiles
-    public void configureBoardPanel() {
+    // Draw 8x8 board with alternating colors for each tile
+    private void configureBoardPanel() {
+        boardPanel.setPreferredSize(new Dimension(800,800));
         boardPanel.setBounds(0,0,800,800);
 
         boolean isWhite = true;
@@ -155,7 +102,28 @@ public class ChessGUI implements ActionListener {
         }
     }
 
-    public void configureSidePanel() {
+    // Create layered pane to displayed on top of board if user reaches pawn promotion
+    private void configurePromotionPanel() {
+        promotionalPanel.setPreferredSize(new Dimension(800,300));
+        promotionalPanel.setBounds(0,250,800,300);
+        promotionalPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 50)); // Center the buttons
+
+        String[] pieces = {"queen", "rook", "bishop", "knight"};
+        for (String piece : pieces) {
+            JButton button = new JButton();
+            button.setText(piece);
+            button.setPreferredSize(new Dimension(100,50));
+            button.setBackground(Color.DARK_GRAY);
+            button.addActionListener(this);
+            promotionalPanel.add(button);
+        }
+
+        promotionalPanel.setVisible(false); // hide initially
+    }
+
+    // Create side panel to display captured pieces and current players turn
+    private void configureSidePanel() {
+        sidePanel.setPreferredSize(new Dimension(300,800));
 
         // Top side panel displays current users turn
         playerPanel = new JPanel();
@@ -169,11 +137,33 @@ public class ChessGUI implements ActionListener {
 
         sidePanel.add(playerPanel, BorderLayout.NORTH);
         sidePanel.add(piecePanel, BorderLayout.SOUTH);
-
     }
 
+    // GUI board initialized after model creation (called within Main)
+    public void initializeBoard(Board board) {
+        ArrayList<Piece> allPieces = board.getAllPieces();
+        for (Piece p : allPieces) {
+            int row = p.getRow();
+            int col = p.getCol();
+            buttons[row][col].setPiece(p);
+        }
+    }
+
+    // Updates GUI based of last move
+    public void update(Move move) {
+        Piece pieceMoved = move.getPiece();
+
+        int prevRow = move.getCurrRow();
+        int prevCol = move.getCurrCol();
+        buttons[prevRow][prevCol].setPiece(null);
+
+        int endRow = move.getTargetRow();
+        int endCol = move.getTargetCol();
+        buttons[endRow][endCol].setPiece(pieceMoved);
+    }
+
+    // Updates captured piece panel after each kill
     public void updatePiecePanel(ArrayList<Piece> capturedPieces) {
-        // should be updated after each kill
         JPanel whitePanel1 = new JPanel();
         whitePanel1.setLayout(new BoxLayout(whitePanel1, BoxLayout.Y_AXIS));
         JPanel blackPanel1 = new JPanel();
@@ -210,32 +200,41 @@ public class ChessGUI implements ActionListener {
         piecePanel.revalidate();
     }
 
-    // called as first update when model is created
-    public void initializeBoard(Board board) {
-        ArrayList<Piece> allPieces = board.getAllPieces();
-        for (Piece p : allPieces) {
-            int row = p.getRow();
-            int col = p.getCol();
-            buttons[row][col].setPiece(p);
+    // A function that highlights the possible moves after user click specified piece
+    public void highlightLegalMoves(ArrayList<int[]> legalMoves) {
+        if(legalMoves == null) {
+            System.out.println("no legal moves for selected piece, pick another one!");
+        } else {
+            for (int[] move : legalMoves) {
+                int x = move[0];
+                int y = move[1];
+                PieceButton button = buttons[x][y];
+                button.highlightBackground();
+                button.setEnabled(true);
+            }
+        }
+
+    }
+
+    // Remove previous highlights after user is finished picking their move
+    public void removeHighlight(ArrayList<int[]> legalMoves) {
+        for (int[] move : legalMoves) {
+            int x = move[0];
+            int y = move[1];
+            PieceButton button = buttons[x][y];
+            button.removeHighlight();
+            button.setEnabled(false);
         }
     }
 
-
-    // only update board based of last move
-    public void update(Move move) {
-        Piece pieceMoved = move.getPiece();
-
-        int prevRow = move.getCurrRow();
-        int prevCol = move.getCurrCol();
-        buttons[prevRow][prevCol].setPiece(null);
-
-        int endRow = move.getTargetRow();
-        int endCol = move.getTargetCol();
-        buttons[endRow][endCol].setPiece(pieceMoved);
+    // Display promotion box for user
+    public void showPromotion() {
+        System.out.println("user just asked to display promotion panel");
+        promotionalPanel.setVisible(true);
+        promotionIsVisible = true;
     }
 
-
-    // called when users turn, enable clicks on user pieces
+    // Enable clicks during user's turn
     public void enableUserClicks(HashMap<Piece, ArrayList<int[]>> availablePieces) {
         for (Piece p : availablePieces.keySet()) {
             ArrayList<int[]> movesForPiece = availablePieces.get(p);
@@ -254,37 +253,35 @@ public class ChessGUI implements ActionListener {
                 buttons[row][col].setEnabled(false);
             }
         }
-
     }
 
-    // A function that highlights the possible moves of specific piece and allows user to click it
-    public void highlightLegalMoves(ArrayList<int[]> legalMoves) {
-        if(legalMoves == null) {
-            System.out.println("no legal moves for selected piece, pick another one!");
+    // actionPerformed method triggered on button click
+    // delegates onClick action to class that implements ClickListener
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        if (promotionIsVisible) {
+            JButton clickedButton = (JButton) e.getSource();
+            String buttonName = clickedButton.getText();
+            System.out.println("You clicked promotional button for: " + buttonName);
+            if (clickListener != null) {
+                clickListener.handlePromotionSelection(buttonName);
+            }
+            promotionalPanel.setVisible(false); // Hide after selection
+            promotionIsVisible = false;
         } else {
-            for (int[] move : legalMoves) {
-                int x = move[0];
-                int y = move[1];
-                PieceButton button = buttons[x][y];
-                button.highlightBackground();
-                button.setEnabled(true);
+            PieceButton clickedButton = (PieceButton) e.getSource();
+            int row = clickedButton.row;
+            int col = clickedButton.col;
+            boolean captured = false;
+            if (clickedButton.getPiece()!=null && clickedButton.getPiece().isWhite()==false) {
+                captured = true;
+            }
+
+            if (clickListener != null) {
+                clickListener.onClick(row, col, captured);
             }
         }
 
-    }
-
-    // remove highlights and clicks is user clicks another piece or completes move
-    public void removeHighlight(ArrayList<int[]> legalMoves) {
-        for (int[] move : legalMoves) {
-            int x = move[0];
-            int y = move[1];
-            PieceButton button = buttons[x][y];
-            button.removeHighlight();
-            button.setEnabled(false);
-        }
-    }
-
-    // display promotion panel
-    public void displayPromotionPanel() {
     }
 }

@@ -232,12 +232,13 @@ public class Board {
         }
 
         Move lastMove = lastMoves.pop();
+        ArrayList<Piece> playerPieces = lastMove.piece.isWhite() ? whitePieces : blackPieces;
 
         // special handling if it was pawn promotion
         if(lastMove.getCurrRow()== lastMove.getTargetRow() && lastMove.getCurrCol() == lastMove.getTargetCol()) {
             Piece promotion = lastMove.getPiece();
             allPieces.remove(promotion);
-            whitePieces.remove(promotion);
+            playerPieces.remove(promotion);
             lastMove = lastMoves.pop();
         }
 
@@ -289,7 +290,7 @@ public class Board {
         // xxxxxxxxxxxxxxxx
         // need to update to be more specific to color bc could apply to pawn promotion
         if(movedPiece instanceof Pawn) {
-            if(prevRow == 1 || prevRow == 6) {
+            if((prevRow == 1 && movedPiece.isWhite()) || (prevRow == 6 && !movedPiece.isWhite())) {
                 movedPiece.setFirstMove(true);
             }
         }
