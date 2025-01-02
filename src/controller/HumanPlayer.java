@@ -3,6 +3,10 @@ package controller;
 import model.Board;
 import model.Move;
 import model.Piece;
+import model.pieces.Bishop;
+import model.pieces.Knight;
+import model.pieces.Queen;
+import model.pieces.Rook;
 import view.ChessGUI;
 import view.ChessGUI.ClickListener;
 
@@ -72,17 +76,32 @@ public class HumanPlayer implements Player, ClickListener {
 
     @Override
     public void handlePromotionSelection(String piece) {
+        System.out.println("Congratulations, you have been promoted! Our best employee");
+        // Create new promotional piece based off user selection
+        Piece promotionalPiece = switch (piece) {
+            case "queen" -> new Queen(true, currentMove.getTargetRow(), currentMove.getTargetCol());
+            case "rook" -> new Rook(true, currentMove.getTargetRow(), currentMove.getTargetCol());
+            case "bishop" -> new Bishop(true, currentMove.getTargetRow(), currentMove.getTargetCol());
+            case "knight" -> new Knight(true, currentMove.getTargetRow(), currentMove.getTargetCol());
+            default -> null;
+        };
+
+        // Create new move and apply to the board
+        Move promotionalMove = new Move(promotionalPiece, currentMove.getTargetRow(), currentMove.getTargetCol());
+        board.movePiece(promotionalMove);
+        gui.update(promotionalMove);
 
     }
 
 
     public void update(Board b, Move move) {
+        board = b;
         gui.disableUserClicks();
         gui.removeHighlight(legalMoves);
         legalMoves = null;
 
         // update board model
-        b.movePiece(move);
+        board.movePiece(move);
         // update game panel
         gui.update(move);
 

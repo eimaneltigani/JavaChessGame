@@ -127,18 +127,12 @@ public class Board {
         int targetCol = move.getTargetCol();
         Piece capturedPiece = board[targetRow][targetCol];
 
+        ArrayList<Piece> playerPieces = color ? whitePieces : blackPieces;
 
 
         // if capturing piece or promoting pawn, remove them off the board
         if(capturedPiece != null) {
-
-
-            if(color) {
-                whitePieces.remove(capturedPiece);
-            } else {
-                blackPieces.remove(capturedPiece);
-            }
-
+            playerPieces.remove(capturedPiece);
             allPieces.remove(capturedPiece);
 
             // if not pawn promotion move, add to captured array
@@ -148,7 +142,7 @@ public class Board {
             } else {
                 // if upgrading pawn, simply update current position to new piece
                 board[targetRow][targetCol] = p;
-                whitePieces.add(p);
+                playerPieces.add(p);
                 allPieces.add(p);
                 lastMoves.add(move);
                 return;
