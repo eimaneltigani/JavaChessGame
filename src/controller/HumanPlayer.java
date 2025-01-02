@@ -117,7 +117,6 @@ public class HumanPlayer implements Player, ClickListener {
                 gui.showPromotion();
             }
         }
-
     }
 
     @Override
