@@ -70,6 +70,12 @@ public class HumanPlayer implements Player, ClickListener {
         }
     }
 
+    @Override
+    public void handlePromotionSelection(String piece) {
+
+    }
+
+
     public void update(Board b, Move move) {
         gui.disableUserClicks();
         gui.removeHighlight(legalMoves);

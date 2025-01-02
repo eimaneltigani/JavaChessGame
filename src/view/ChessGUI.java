@@ -29,6 +29,8 @@ public class ChessGUI implements ActionListener {
     JPanel sidePanel;
     JPanel playerPanel;
     JPanel piecePanel;
+    JPanel promotionalPanel;
+    JLayeredPane layeredPane;
     PieceButton[][] buttons = new PieceButton[8][8];
 
     //
@@ -36,6 +38,8 @@ public class ChessGUI implements ActionListener {
 
     public interface ClickListener {
         void onClick(int row, int col, boolean captured);
+
+        void handlePromotionSelection(String piece);
     }
 
     // actionPerformed method triggered on button click
@@ -66,25 +70,55 @@ public class ChessGUI implements ActionListener {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Shut down program on window close or else it'll keep running
         window.setResizable(false);
 
-        // set up panels
+        // Main components
         gamePanel = new JPanel(new BorderLayout());
         gamePanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+        layeredPane = new JLayeredPane();
+        layeredPane.setBounds(0,0,800,800);
 
         boardPanel = new JPanel(new GridLayout(8, 8));
         boardPanel.setPreferredSize(new Dimension(800,800));
         configureBoardPanel();
 
+        promotionalPanel = new JPanel();
+        promotionalPanel.setBounds(0,250,300,800);
+        promotionalPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 50)); // Center the buttons
+        configurePromotionPanel();
+        promotionalPanel.setVisible(false); // hide initially
+
         sidePanel = new JPanel(new BorderLayout());
         sidePanel.setPreferredSize(new Dimension(300,800));
         configureSidePanel();
 
-        gamePanel.add(boardPanel, BorderLayout.WEST);
+        // add components to layered pane
+        layeredPane.add(boardPanel, JLayeredPane.DEFAULT_LAYER);
+        layeredPane.add(promotionalPanel, JLayeredPane.PALETTE_LAYER);
+
+        // add everything to main frame
+        gamePanel.add(layeredPane, BorderLayout.WEST);
         gamePanel.add(sidePanel, BorderLayout.EAST);
+
 
         window.add(gamePanel);
         window.pack();
         window.setLocationRelativeTo(null); // window will show up at center of monitor
         window.setVisible(true);
+    }
+
+    private void configurePromotionPanel() {
+        String[] pieces = {"queen", "rook", "bishop", "knight"};
+
+        for (String piece : pieces) {
+            JButton button = new JButton();
+            button.setPreferredSize(new Dimension(100,50));
+            promotionalPanel.add(button);
+
+            button.addActionListener(e -> {
+                clickListener.handlePromotionSelection(piece);
+                promotionalPanel.setVisible(false); // Hide after selection
+            });
+        }
     }
 
 
@@ -235,5 +269,7 @@ public class ChessGUI implements ActionListener {
         }
     }
 
-
+    // display promotion panel
+    public void displayPromotionPanel() {
+    }
 }
