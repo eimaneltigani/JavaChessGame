@@ -3,10 +3,7 @@ package controller;
 import model.Board;
 import model.Move;
 import model.Piece;
-import model.pieces.Bishop;
-import model.pieces.Knight;
-import model.pieces.Queen;
-import model.pieces.Rook;
+import model.pieces.*;
 import view.ChessGUI;
 import view.ChessGUI.ClickListener;
 
@@ -19,6 +16,7 @@ public class HumanPlayer implements Player, ClickListener {
     Piece selectedPiece;
     ArrayList<int[]> legalMoves;
     Move currentMove;
+    boolean handlingPromotion;
 
     public HumanPlayer() {
         gui = new ChessGUI(this);
@@ -53,7 +51,6 @@ public class HumanPlayer implements Player, ClickListener {
 
     @Override
     public void onClick(int row, int col, boolean captured) {
-        System.out.println("User clicked row:" + row + "and col:" + col);
         Piece piece = board.findPieceByLocation(row, col);
 
         // If selecting piece for first time
@@ -69,14 +66,14 @@ public class HumanPlayer implements Player, ClickListener {
             legalMoves = selectedPiece.availableMoves(board);
             gui.highlightLegalMoves(legalMoves);
         } else {
-
             currentMove = new Move(selectedPiece, row, col);
         }
     }
 
     @Override
     public void handlePromotionSelection(String piece) {
-        System.out.println("Congratulations, you have been promoted! Our best employee");
+        System.out.println(piece);
+        System.out.print(currentMove);
         // Create new promotional piece based off user selection
         Piece promotionalPiece = switch (piece) {
             case "queen" -> new Queen(true, currentMove.getTargetRow(), currentMove.getTargetCol());
@@ -90,6 +87,7 @@ public class HumanPlayer implements Player, ClickListener {
         Move promotionalMove = new Move(promotionalPiece, currentMove.getTargetRow(), currentMove.getTargetCol());
         board.movePiece(promotionalMove);
         gui.update(promotionalMove);
+        handlingPromotion = false;
 
     }
 
@@ -112,6 +110,13 @@ public class HumanPlayer implements Player, ClickListener {
         }
 
         // handle pawn promotion
+        if(move.getPiece() instanceof Pawn && move.getTargetRow() == 0) {
+            handlingPromotion = true;
+            while (handlingPromotion) {
+                currentMove = move;
+                gui.showPromotion();
+            }
+        }
 
     }
 

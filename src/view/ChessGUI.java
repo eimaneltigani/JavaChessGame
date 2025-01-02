@@ -6,6 +6,7 @@ import model.Piece;
 import controller.Player;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,7 +33,7 @@ public class ChessGUI implements ActionListener {
     JPanel promotionalPanel;
     JLayeredPane layeredPane;
     PieceButton[][] buttons = new PieceButton[8][8];
-
+    boolean promotionIsVisible = false;
     //
     ClickListener clickListener;
 
@@ -46,19 +47,30 @@ public class ChessGUI implements ActionListener {
     // delegates onClick action to class that implements ClickListener
     @Override
     public void actionPerformed(ActionEvent e) {
-        PieceButton clickedButton = (PieceButton) e.getSource();
-        int row = clickedButton.row;
-        int col = clickedButton.col;
-        boolean captured = false;
-        if (clickedButton.getPiece()!=null && clickedButton.getPiece().isWhite()==false) {
-            captured = true;
-        }
 
-        if (clickListener != null) {
-            clickListener.onClick(row, col, captured);
+        if (promotionIsVisible) {
+            JButton clickedButton = (JButton) e.getSource();
+            String buttonName = clickedButton.getText();
+            System.out.println("You clicked promotional button for: " + buttonName);
+            if (clickListener != null) {
+                clickListener.handlePromotionSelection(buttonName);
+            }
+            promotionalPanel.setVisible(false); // Hide after selection
+            promotionIsVisible = false;
+        } else {
+            PieceButton clickedButton = (PieceButton) e.getSource();
+            int row = clickedButton.row;
+            int col = clickedButton.col;
+            boolean captured = false;
+            if (clickedButton.getPiece()!=null && clickedButton.getPiece().isWhite()==false) {
+                captured = true;
+            }
+
+            if (clickListener != null) {
+                clickListener.onClick(row, col, captured);
+            }
         }
     }
-
 
     /**
      * Contructor for GUI
@@ -68,21 +80,22 @@ public class ChessGUI implements ActionListener {
         this.clickListener = clicklistener;
         window = new JFrame("Chess Game");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Shut down program on window close or else it'll keep running
+        window.setSize(WIDTH, HEIGHT);
+        window.setLayout(new BorderLayout());
         window.setResizable(false);
 
         // Main components
-        gamePanel = new JPanel(new BorderLayout());
-        gamePanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-
         layeredPane = new JLayeredPane();
+        layeredPane.setPreferredSize(new Dimension(800,800));
         layeredPane.setBounds(0,0,800,800);
 
-        boardPanel = new JPanel(new GridLayout(8, 8));
+        boardPanel = new JPanel(new GridLayout(8, 8, 0, 0));
         boardPanel.setPreferredSize(new Dimension(800,800));
         configureBoardPanel();
 
         promotionalPanel = new JPanel();
-        promotionalPanel.setBounds(0,250,300,800);
+        promotionalPanel.setPreferredSize(new Dimension(800,300));
+        promotionalPanel.setBounds(0,250,800,300);
         promotionalPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 50)); // Center the buttons
         configurePromotionPanel();
         promotionalPanel.setVisible(false); // hide initially
@@ -95,12 +108,8 @@ public class ChessGUI implements ActionListener {
         layeredPane.add(boardPanel, JLayeredPane.DEFAULT_LAYER);
         layeredPane.add(promotionalPanel, JLayeredPane.PALETTE_LAYER);
 
-        // add everything to main frame
-        gamePanel.add(layeredPane, BorderLayout.WEST);
-        gamePanel.add(sidePanel, BorderLayout.EAST);
-
-
-        window.add(gamePanel);
+        window.add(layeredPane, BorderLayout.WEST);
+        window.add(sidePanel, BorderLayout.EAST);
         window.pack();
         window.setLocationRelativeTo(null); // window will show up at center of monitor
         window.setVisible(true);
@@ -111,19 +120,25 @@ public class ChessGUI implements ActionListener {
 
         for (String piece : pieces) {
             JButton button = new JButton();
+            button.setText(piece);
             button.setPreferredSize(new Dimension(100,50));
+            button.setBackground(Color.DARK_GRAY);
+            button.addActionListener(this);
             promotionalPanel.add(button);
-
-            button.addActionListener(e -> {
-                clickListener.handlePromotionSelection(piece);
-                promotionalPanel.setVisible(false); // Hide after selection
-            });
         }
+    }
+
+    public void showPromotion() {
+        System.out.println("user just asked to display promotion panel");
+        promotionalPanel.setVisible(true);
+        promotionIsVisible = true;
     }
 
 
     // set buttons and background color for board tiles
     public void configureBoardPanel() {
+        boardPanel.setBounds(0,0,800,800);
+
         boolean isWhite = true;
         for (int row = 0; row < MAX_ROW; row++) {
             for (int col = 0; col < MAX_COL; col++) {
