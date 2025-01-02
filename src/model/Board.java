@@ -125,18 +125,36 @@ public class Board {
 
         int targetRow = move.getTargetRow();
         int targetCol = move.getTargetCol();
+        Piece capturedPiece = board[targetRow][targetCol];
 
-        // if capturing piece, update array lists
-        if(board[targetRow][targetCol] != null) {
-            move.setCaptured(true);
-            Piece capturedPiece = board[targetRow][targetCol];
-            if(capturedPiece.isWhite()) {
+
+
+        // if capturing piece or promoting pawn, remove them off the board
+        if(capturedPiece != null) {
+
+
+            if(color) {
                 whitePieces.remove(capturedPiece);
             } else {
                 blackPieces.remove(capturedPiece);
             }
-            capturedPieces.add(capturedPiece);
+
             allPieces.remove(capturedPiece);
+
+            // if not pawn promotion move, add to captured array
+            if(!(currRow==targetRow && currCol==targetCol)) {
+                move.setCaptured(true);
+                capturedPieces.add(capturedPiece);
+            } else {
+                // if upgrading pawn, simply update current position to new piece
+                board[targetRow][targetCol] = p;
+                whitePieces.add(p);
+                allPieces.add(p);
+                lastMoves.add(move);
+                return;
+            }
+
+
         }
 
         // update Piece coordinates
@@ -160,23 +178,6 @@ public class Board {
             board[currRow][rookTargetCol] = rook;
             board[currRow][rookCurrCol] = null;
         }
-        // need to add some handling for pawn promotion
-        // can decide once figure out how that could be handled
-        // on computer side
-        if(p instanceof Pawn) {
-            if(p.isWhite() && p.getRow() == 0) {
-                // let user pick
-                System.out.println("hey girl go get that pawn promotion");
-            } else if (!p.isWhite() && p.getRow() == 7) {
-                // if computer, will always pick queen
-                // remove Pawn from lists
-                // xxxxx
-                p = new Queen(color, targetCol, targetRow);
-
-
-
-            }
-        }
 
 
         // update board
@@ -186,11 +187,16 @@ public class Board {
         // save last move
         lastMoves.add(move);
 
-//        // check if move puts opposite king in check
-//        if(inCheck(!p.isWhite())) {
-//            King oppositKing = p.isWhite() ? blackKing : whiteKing;
-//            oppositKing.markCheck(true);
-//        }
+        // need to add some handling for pawn promotion
+        // logic - create new move for promotion in same spot
+        if (p instanceof Pawn && p.isWhite() && p.getRow() == 0) {
+            // let user pick
+            System.out.println("hello from model board, user needs to pick a promotion piece");
+        } else if (p instanceof Pawn && !p.isWhite() && p.getRow() == 7) {
+            // computer picks Queen everytime
+            Piece newPiece = new Queen(false, targetRow, targetCol);
+            movePiece(new Move(newPiece, targetRow, targetCol));
+        }
     }
 
     public HashMap<Piece, ArrayList<int[]>> getAllPossibleMoves(boolean color) {
@@ -232,6 +238,14 @@ public class Board {
         }
 
         Move lastMove = lastMoves.pop();
+
+        // special handling if it was pawn promotion
+        if(lastMove.getCurrRow()== lastMove.getTargetRow() && lastMove.getCurrCol() == lastMove.getTargetCol()) {
+            Piece promotion = lastMove.getPiece();
+            allPieces.remove(promotion);
+            whitePieces.remove(promotion);
+            lastMove = lastMoves.pop();
+        }
 
         int prevRow = lastMove.currRow;
         int prevCol = lastMove.currCol;
@@ -285,6 +299,7 @@ public class Board {
                 movedPiece.setFirstMove(true);
             }
         }
+
     }
 
     public boolean inCheck(boolean isWhite) {

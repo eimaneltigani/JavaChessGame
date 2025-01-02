@@ -86,6 +86,8 @@ public class HumanPlayer implements Player, ClickListener {
             gui.updatePiecePanel(b.getCapturedPieces());
         }
 
+        // handle pawn promotion
+
     }
 
     @Override
