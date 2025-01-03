@@ -7,6 +7,7 @@ import model.pieces.*;
 import view.ChessGUI;
 import view.ChessGUI.ClickListener;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -32,6 +33,10 @@ public class HumanPlayer implements Player, ClickListener {
         board = b;
         selectedPiece = null;
 
+        if (board.inCheck(color)) {
+            gui.setCheck(board.getKing(color));
+        }
+
         // enable clicks for user pieces
         HashMap<Piece, ArrayList<int[]>> availablePiecesToMove = board.getAllPossibleMoves(color);
         gui.enableUserClicks(availablePiecesToMove);
@@ -46,6 +51,7 @@ public class HumanPlayer implements Player, ClickListener {
                 System.out.println("Interrupted while waiting for the move.");
             }
         }
+
         board = null;
         return currentMove;
     }
@@ -57,13 +63,13 @@ public class HumanPlayer implements Player, ClickListener {
         // If selecting piece for first time
         if (selectedPiece == null && piece.isWhite()) {
             selectedPiece = piece;
-            legalMoves = selectedPiece.availableMoves(board);
+            legalMoves = new ArrayList<>(selectedPiece.availableMoves(board));
             gui.highlightLegalMoves(legalMoves);
         } else if (piece!= null && piece.isWhite()) {
             // if user is selecting another piece to move
             gui.removeHighlight(legalMoves);
             selectedPiece = piece;
-            legalMoves = selectedPiece.availableMoves(board);
+            legalMoves = new ArrayList<>(selectedPiece.availableMoves(board));
             gui.highlightLegalMoves(legalMoves);
         } else {
             currentMove = new Move(selectedPiece, row, col);
@@ -72,8 +78,7 @@ public class HumanPlayer implements Player, ClickListener {
 
     @Override
     public void handlePromotionSelection(String piece) {
-        System.out.println(piece);
-        System.out.print(currentMove);
+
         // Create new promotional piece based off user selection
         Piece promotionalPiece = switch (piece) {
             case "queen" -> new Queen(true, currentMove.getTargetRow(), currentMove.getTargetCol());
@@ -93,21 +98,18 @@ public class HumanPlayer implements Player, ClickListener {
 
 
     public void update(Board b, Move move) {
-        board = b;
-        gui.disableUserClicks();
-        gui.removeHighlight(legalMoves);
-        legalMoves = null;
+        // need to deactivate red background if king WAS in check last round but no longer is
+        // also made me think about what if checkmate, move would be equal to null here?
+        b.movePiece(move);
 
-        // update board model
-        board.movePiece(move);
-        // update game panel
-        gui.update(move);
-
-        // update captured panel
-        if(move.isCaptured()) {
-            System.out.println("captured piece!");
-            gui.updateCapturedPiecePanel(b.getCapturedPieces());
-        }
+        SwingUtilities.invokeLater(() -> {
+            gui.disableUserClicks();
+            gui.removeHighlight(legalMoves);
+            gui.update(move);
+            if (move.isCaptured()) {
+                gui.updateCapturedPiecePanel(b.getCapturedPieces());
+            }
+        });
 
         // handle pawn promotion
         if(move.getPiece() instanceof Pawn && move.getTargetRow() == 0) {

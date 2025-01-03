@@ -32,10 +32,10 @@ public class Pawn extends Piece {
         if(isWithinBounds(nextRow, currCol) && board.findPieceByLocation(nextRow,currCol)==null) {
             legalMoves.add(new int[]{nextRow, currCol});
 
-            // Starting position move (only if first square is empty)
+            // Starting position move (only if next square is empty)
             int twoStepRow = currRow + 2 * direction;
             if (firstMove && isWithinBounds(twoStepRow, currCol)
-                    && (board.findPieceByLocation(nextRow, currCol) == null)) {
+                    && (board.findPieceByLocation(twoStepRow, currCol) == null)) {
                     legalMoves.add(new int[]{twoStepRow, currCol});
             }
         }

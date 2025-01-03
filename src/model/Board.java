@@ -2,7 +2,9 @@ package model;
 
 import model.pieces.*;
 
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -178,15 +180,19 @@ public class Board {
     }
 
 
-    // Function to return all possible moves for each piece of specified color
+    // Function to eliminate the possible moves that will put the king in danger
     public HashMap<Piece, ArrayList<int[]>> getAllPossibleMoves(boolean color) {
+        if (inCheck(color)) {
+            System.out.println(color + "player is in check!");
+        }
+
         HashMap<Piece, ArrayList<int[]>> map = new HashMap<>();
-        ArrayList<Piece> playerPieces = color ? whitePieces : blackPieces;
+        ArrayList<Piece> playerPieces = new ArrayList<>(color ? whitePieces : blackPieces); // Cloning Collections for Safe Iteration
 
         for (Piece p : playerPieces) {
             ArrayList<int[]> legalMoves = new ArrayList<>();
             // Generate ALL moves of a given piece first
-            ArrayList<int[]> pseudoLegalMoves = p.availableMoves(this);
+            ArrayList<int[]> pseudoLegalMoves = new ArrayList<>(p.availableMoves(this)); // Create copy of moves
             // Add to legal moves after checking that it is safe
             for (int[] move : pseudoLegalMoves) {
                 if (!putsKingInDanger(p, move[0], move[1])) {
@@ -279,12 +285,14 @@ public class Board {
 
     public boolean inCheck(boolean isWhite) {
         King currKing = isWhite ? whiteKing : blackKing;
-        int[] kingLocation = new int[]{currKing.getRow(), currKing.getCol()};
-        ArrayList<Piece> oppositePieces = isWhite ? blackPieces : whitePieces;
-        for(Piece opp : oppositePieces) {
-            ArrayList<int[]> potentialMoves = opp.availableMoves(this);
-            if(potentialMoves.contains(kingLocation)) {
-                return true;
+        int[] kingsLocation = new int[]{currKing.getRow(), currKing.getCol()};
+        ArrayList<Piece> opponentPieces = new ArrayList<>(isWhite ? blackPieces : whitePieces);
+        for(Piece opp : opponentPieces) {
+            ArrayList<int[]> potentialMoves = new ArrayList<>(opp.availableMoves(this));
+            for (int[] move : potentialMoves) {
+                if (Arrays.equals(move, kingsLocation)) {
+                    return true;
+                }
             }
         }
 
@@ -349,11 +357,8 @@ public class Board {
         board[row][col] = p;
     }
 
-    public Piece getWhiteKing() {
-        return whiteKing;
+    public Piece getKing(boolean color) {
+        return color ? whiteKing : blackKing;
     }
 
-    public Piece getBlackKing() {
-        return blackKing;
-    }
 }

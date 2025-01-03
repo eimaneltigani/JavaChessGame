@@ -21,7 +21,7 @@ public class Main {
             Move move = currPlayer.decideMove(board);
             currPlayer.update(board, move);
 
-             currPlayer = currPlayer.getColor() ? p2 : p1;
+            currPlayer = currPlayer.getColor() ? p2 : p1;
         }
 
     }

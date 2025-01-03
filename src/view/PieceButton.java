@@ -46,8 +46,8 @@ public class PieceButton extends JButton {
         return this.piece;
     }
 
-    public void highlightBackground() {
-        this.backgroundColor = Color.GREEN;
+    public void changeBackground(Color color) {
+        this.backgroundColor = color;
         repaint(); // Request re-rendering to apply the new background
     }
 

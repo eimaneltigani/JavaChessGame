@@ -79,7 +79,7 @@ public class TestGameBoard {
 
     @Test
     public void testKingSideCastling() {
-        Piece king = board.getBlackKing();
+        Piece king = board.getKing(false);
         board.placePiece(null,0, 5);
         board.placePiece(null,0, 6);
         Move move = new Move(king,0, 6);
@@ -95,7 +95,7 @@ public class TestGameBoard {
 
     @Test
     public void undoQueenSideCastling() {
-        Piece king = board.getBlackKing();
+        Piece king = board.getKing(false);
         Move move = new Move(king,0, 2);
         board.movePiece(move);
         board.undoLastMove();

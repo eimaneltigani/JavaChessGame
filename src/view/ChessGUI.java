@@ -1,6 +1,5 @@
 package view;
 
-import controller.Player;
 import model.Board;
 import model.Move;
 import model.Piece;
@@ -98,6 +97,7 @@ public class ChessGUI implements ActionListener {
                 PieceButton b = new PieceButton(row, col, color);
                 buttons[row][col] = b;
                 b.addActionListener(this);
+                b.setFocusable(false);
                 b.setEnabled(false);
                 boardPanel.add(b);
 
@@ -256,7 +256,7 @@ public class ChessGUI implements ActionListener {
                 int x = move[0];
                 int y = move[1];
                 PieceButton button = buttons[x][y];
-                button.highlightBackground();
+                button.changeBackground(Color.GREEN);
                 button.setEnabled(true);
             }
         }
@@ -271,6 +271,15 @@ public class ChessGUI implements ActionListener {
             button.removeHighlight();
             button.setEnabled(false);
         }
+    }
+
+    public void setCheck(Piece king) {
+        int row = king.getRow();
+        int col = king.getCol();
+
+        // find coordinating piece button
+        PieceButton button = buttons[row][col];
+        button.changeBackground(Color.RED);
     }
 
     // Display promotion box for user
