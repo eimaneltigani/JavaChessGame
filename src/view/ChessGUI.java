@@ -6,6 +6,7 @@ import model.Move;
 import model.Piece;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +23,8 @@ public class ChessGUI implements ActionListener {
     JPanel boardPanel;
     JPanel sidePanel;
     JPanel playerPanel;
+    JPanel humanPanel;
+    JPanel computerPanel;
     JPanel piecePanel;
     JLabel turnLabel;
     JPanel promotionalPanel;
@@ -131,8 +134,12 @@ public class ChessGUI implements ActionListener {
         playerPanel = new JPanel();
         playerPanel.setPreferredSize(new Dimension(300,200));
         playerPanel.setBackground(Color.GRAY);
-        turnLabel = new JLabel("Turn: White", SwingConstants.CENTER);
-        turnLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        playerPanel.setLayout(new GridLayout(1,2));
+        // create panels for each player
+        humanPanel = createPlayerPanel("Human Player",  "res/piece/w-king.png");
+        computerPanel = createPlayerPanel("Computer Player",  "res/piece/b-king.png");
+        playerPanel.add(humanPanel);
+        playerPanel.add(computerPanel);
 
         // Lower side panel displays captured pieces
         piecePanel = new JPanel();
@@ -142,6 +149,31 @@ public class ChessGUI implements ActionListener {
         sidePanel.add(playerPanel, BorderLayout.NORTH);
         sidePanel.add(piecePanel, BorderLayout.SOUTH);
     }
+
+    private JPanel createPlayerPanel(String playerName, String iconPath) {
+        JPanel playerPanel = new JPanel(new GridBagLayout());
+        playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
+
+        // Add vertical padding at the top
+        playerPanel.add(Box.createVerticalGlue());
+
+        JLabel iconLabel = new JLabel(new ImageIcon(iconPath));
+        iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        playerPanel.add(iconLabel);
+
+        // Create and add the text label
+        JLabel textLabel = new JLabel(playerName);
+        textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        playerPanel.add(textLabel);
+
+        // Add vertical padding at the bottom
+        playerPanel.add(Box.createVerticalGlue());
+
+        // Add padding and set initial border
+        playerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        return playerPanel;
+    }
+
 
     // GUI board initialized after model creation (called within Main)
     public void initializeBoard(Board board) {
@@ -204,11 +236,13 @@ public class ChessGUI implements ActionListener {
         piecePanel.revalidate();
     }
 
-    public void updatePlayerPanel(boolean player) {
+    public void setTurn(boolean player) {
         if (player) {
-            turnLabel.setText("White's turn!");
+            humanPanel.setBorder(new LineBorder(Color.GREEN, 3));
+            computerPanel.setBorder(new LineBorder(Color.BLACK, 1));
         } else {
-            turnLabel.setText("Computer's turn!");
+            humanPanel.setBorder(new LineBorder(Color.GREEN, 3));
+            computerPanel.setBorder(new LineBorder(Color.BLACK, 1));
         }
     }
 

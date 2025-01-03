@@ -7,7 +7,6 @@ import view.ChessGUI;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class ComputerPlayer implements Player {
@@ -27,6 +26,7 @@ public class ComputerPlayer implements Player {
     }
 
     public Move decideMove(Board board) {
+        gui.setTurn(true);
         HashMap<Piece, ArrayList<int[]>> bPieces = board.getAllPossibleMoves(color);
 
         // choosing random play for now
