@@ -193,7 +193,9 @@ public class Board {
                     legalMoves.add(move);
                 }
             }
-            map.put(p, legalMoves);
+            if(!legalMoves.isEmpty()) {
+                map.put(p, legalMoves);
+            }
         }
 
         return map;

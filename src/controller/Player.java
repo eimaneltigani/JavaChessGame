@@ -2,6 +2,7 @@ package controller;
 
 import model.Board;
 import model.Move;
+import view.ChessGUI;
 
 /**
  * Base class to ensure players (both human and computer)
@@ -13,7 +14,7 @@ public interface Player {
 
     void update(Board board, Move move);
 
-    void initializeBoard(Board board);
+    void initializeBoard(ChessGUI gui);
 
-    boolean isHuman();
+    boolean getColor();
 }

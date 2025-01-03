@@ -249,12 +249,9 @@ public class ChessGUI implements ActionListener {
     // Enable clicks during user's turn
     public void enableUserClicks(HashMap<Piece, ArrayList<int[]>> availablePieces) {
         for (Piece p : availablePieces.keySet()) {
-            ArrayList<int[]> movesForPiece = availablePieces.get(p);
             int row = p.getRow();
             int col = p.getCol();
-            if(!movesForPiece.isEmpty()) {
-                buttons[row][col].setEnabled(true);
-            }
+            buttons[row][col].setEnabled(true);
         }
     }
 

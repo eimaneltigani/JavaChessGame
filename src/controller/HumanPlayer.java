@@ -17,15 +17,15 @@ public class HumanPlayer implements Player, ClickListener {
     ArrayList<int[]> legalMoves;
     Move currentMove;
     boolean handlingPromotion;
+    boolean color;
 
     public HumanPlayer() {
-        gui = new ChessGUI(this);
+        this.color = true;
     }
 
-    public void initializeBoard(Board b) {
-        gui.initializeBoard(b);
+    public void initializeBoard(ChessGUI gui) {
+        this.gui = gui;
     }
-
 
     public Move decideMove(Board b) {
         currentMove = null; // reset move before starting
@@ -33,7 +33,7 @@ public class HumanPlayer implements Player, ClickListener {
         selectedPiece = null;
 
         // enable clicks for user pieces
-        HashMap<Piece, ArrayList<int[]>> availablePiecesToMove = board.getAllPossibleMoves(true);
+        HashMap<Piece, ArrayList<int[]>> availablePiecesToMove = board.getAllPossibleMoves(color);
         gui.enableUserClicks(availablePiecesToMove);
         gui.updatePlayerPanel(true);
 
@@ -120,8 +120,7 @@ public class HumanPlayer implements Player, ClickListener {
     }
 
     @Override
-    public boolean isHuman() {
-        return true;
+    public boolean getColor() {
+        return color;
     }
-
 }
