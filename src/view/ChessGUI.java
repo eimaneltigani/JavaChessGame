@@ -1,5 +1,6 @@
 package view;
 
+import controller.Player;
 import model.Board;
 import model.Move;
 import model.Piece;
@@ -22,6 +23,7 @@ public class ChessGUI implements ActionListener {
     JPanel sidePanel;
     JPanel playerPanel;
     JPanel piecePanel;
+    JLabel turnLabel;
     JPanel promotionalPanel;
     JLayeredPane layeredPane;
     PieceButton[][] buttons = new PieceButton[8][8];
@@ -129,6 +131,8 @@ public class ChessGUI implements ActionListener {
         playerPanel = new JPanel();
         playerPanel.setPreferredSize(new Dimension(300,200));
         playerPanel.setBackground(Color.GRAY);
+        turnLabel = new JLabel("Turn: White", SwingConstants.CENTER);
+        turnLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
         // Lower side panel displays captured pieces
         piecePanel = new JPanel();
@@ -163,7 +167,7 @@ public class ChessGUI implements ActionListener {
     }
 
     // Updates captured piece panel after each kill
-    public void updatePiecePanel(ArrayList<Piece> capturedPieces) {
+    public void updateCapturedPiecePanel(ArrayList<Piece> capturedPieces) {
         JPanel whitePanel1 = new JPanel();
         whitePanel1.setLayout(new BoxLayout(whitePanel1, BoxLayout.Y_AXIS));
         JPanel blackPanel1 = new JPanel();
@@ -200,9 +204,18 @@ public class ChessGUI implements ActionListener {
         piecePanel.revalidate();
     }
 
+    public void updatePlayerPanel(boolean player) {
+        if (player) {
+            turnLabel.setText("White's turn!");
+        } else {
+            turnLabel.setText("Computer's turn!");
+        }
+    }
+
+
     // A function that highlights the possible moves after user click specified piece
     public void highlightLegalMoves(ArrayList<int[]> legalMoves) {
-        if(legalMoves == null) {
+        if (legalMoves == null) {
             System.out.println("no legal moves for selected piece, pick another one!");
         } else {
             for (int[] move : legalMoves) {
@@ -213,7 +226,6 @@ public class ChessGUI implements ActionListener {
                 button.setEnabled(true);
             }
         }
-
     }
 
     // Remove previous highlights after user is finished picking their move
@@ -228,7 +240,7 @@ public class ChessGUI implements ActionListener {
     }
 
     // Display promotion box for user
-    public void showPromotion() {
+    public void showPromotionalPanel() {
         System.out.println("user just asked to display promotion panel");
         promotionalPanel.setVisible(true);
         promotionIsVisible = true;

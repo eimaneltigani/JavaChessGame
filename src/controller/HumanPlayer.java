@@ -35,6 +35,7 @@ public class HumanPlayer implements Player, ClickListener {
         // enable clicks for user pieces
         HashMap<Piece, ArrayList<int[]>> availablePiecesToMove = board.getAllPossibleMoves(true);
         gui.enableUserClicks(availablePiecesToMove);
+        gui.updatePlayerPanel(true);
 
         // wait until user finishes decision
         while (currentMove == null) {
@@ -58,7 +59,6 @@ public class HumanPlayer implements Player, ClickListener {
             selectedPiece = piece;
             legalMoves = selectedPiece.availableMoves(board);
             gui.highlightLegalMoves(legalMoves);
-
         } else if (piece!= null && piece.isWhite()) {
             // if user is selecting another piece to move
             gui.removeHighlight(legalMoves);
@@ -106,7 +106,7 @@ public class HumanPlayer implements Player, ClickListener {
         // update captured panel
         if(move.isCaptured()) {
             System.out.println("captured piece!");
-            gui.updatePiecePanel(b.getCapturedPieces());
+            gui.updateCapturedPiecePanel(b.getCapturedPieces());
         }
 
         // handle pawn promotion
@@ -114,7 +114,7 @@ public class HumanPlayer implements Player, ClickListener {
             handlingPromotion = true;
             while (handlingPromotion) {
                 currentMove = move;
-                gui.showPromotion();
+                gui.showPromotionalPanel();
             }
         }
     }

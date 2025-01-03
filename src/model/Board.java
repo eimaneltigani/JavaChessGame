@@ -123,13 +123,17 @@ public class Board {
         int targetRow = move.getTargetRow();
         int targetCol = move.getTargetCol();
 
-        // First check if capturing opponent piece before updating target dest
+        // Handle capture
         Piece capturedPiece = board[targetRow][targetCol];
-        if(capturedPiece != null && capturedPiece.isWhite()!=p.isWhite()) { // update lists accordingly
-            move.setCaptured(true);
-            opponentPieces.remove(capturedPiece);
+        if(capturedPiece != null) { // update lists accordingly
+            if (capturedPiece.isWhite()!=p.isWhite()) { // capturing opponent piece
+                move.setCaptured(true);
+                opponentPieces.remove(capturedPiece);
+                capturedPieces.add(capturedPiece);
+            } else { // pawn promotion
+                playerPieces.remove(capturedPiece);
+            }
             allPieces.remove(capturedPiece);
-            capturedPieces.add(capturedPiece);
         }
 
         // Update piece coordinates
@@ -219,9 +223,10 @@ public class Board {
         // special handling for pawn promotion, remove additional piece and move
         if(lastMove.getCurrRow() == lastMove.getTargetRow() && lastMove.getCurrCol() == lastMove.getTargetCol()) {
             Piece promotion = lastMove.getPiece();
-            allPieces.remove(promotion);
+            allPieces.remove(promotion); // remove promotion piece
             playerPieces.remove(promotion);
             lastMove = lastMoves.pop();
+            playerPieces.add(lastMove.getPiece()); // bring back pawn
         }
 
         int prevRow = lastMove.currRow;
@@ -248,10 +253,11 @@ public class Board {
         board[prevRow][prevCol] = movedPiece;
 
 
-        // revert castling
+        // for firstMove instances
         if (movedPiece instanceof King && Math.abs(currCol-prevCol) == 2) {
-            boolean kingside = prevCol > 4;
-            int rookCurrCol = kingside ? currCol + 1 : currCol - 1;
+            // revert castling
+            boolean kingside = currCol > 4;
+            int rookCurrCol = kingside ? currCol - 1 : currCol + 1;
             int rookTargetCol = kingside ? 7 : 0;
             // find rook
             Piece rook = board[currRow][rookCurrCol];
@@ -262,7 +268,7 @@ public class Board {
             rook.setFirstMove(true);
             movedPiece.setFirstMove(true);
         } else if(movedPiece instanceof Pawn) {
-            if((prevRow == 1 && movedPiece.isWhite()) || (prevRow == 6 && !movedPiece.isWhite())) {
+            if((prevRow == 1 && !movedPiece.isWhite()) || (prevRow == 6 && movedPiece.isWhite())) {
                 movedPiece.setFirstMove(true);
             }
         }
@@ -332,7 +338,20 @@ public class Board {
         return capturedPieces;
     }
 
-    public Stack<Move> getLastMove() {
+    public Stack<Move> getLastMoves() {
         return lastMoves;
+    }
+
+    /** for testing purposes **/
+    public void placePiece(Piece p, int row, int col) {
+        board[row][col] = p;
+    }
+
+    public Piece getWhiteKing() {
+        return whiteKing;
+    }
+
+    public Piece getBlackKing() {
+        return blackKing;
     }
 }
