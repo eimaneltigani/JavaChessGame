@@ -10,10 +10,12 @@ import java.util.ArrayList;
  */
 public class Pawn extends Piece {
     int direction;
+    boolean firstMove;
 
     public Pawn(boolean isWhite, int col, int row) {
         super("pawn", isWhite, col, row);
         direction = isWhite ? -1 : 1; // White moves up (-1), Black moves down (+1)
+        firstMove = true;
     }
 
     @Override
@@ -52,5 +54,13 @@ public class Pawn extends Piece {
         }
 
         return legalMoves;
+    }
+
+    public boolean getFirstMove() {
+        return firstMove;
+    }
+
+    public void setFirstMove(boolean isFirst) {
+        this.firstMove = isFirst;
     }
 }

@@ -1,8 +1,10 @@
 package model.pieces;
 import model.Board;
+import model.Move;
 import model.Piece;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * Rook rules - Moves any number of squares horizontally or vertically
@@ -14,9 +16,11 @@ public class Rook extends Piece {
             {0, -1}, // Left
             {0, 1}   // Right
     };
+    Stack<Move> lastMoves;
 
     public Rook(boolean isWhite, int col, int row) {
         super("rook", isWhite, col, row);
+        lastMoves = new Stack<>();
     }
 
     @Override
@@ -58,5 +62,19 @@ public class Rook extends Piece {
         }
 
         return legalMoves;
+    }
+
+    public Stack<Move> getLastMoves() {
+        return lastMoves;
+    }
+
+    public void addMove(Move move) {
+        lastMoves.add(move);
+    }
+
+    public void removeLastMove() {
+        if(!lastMoves.isEmpty()) {
+            lastMoves.pop();
+        }
     }
 }

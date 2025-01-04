@@ -1,11 +1,14 @@
 import model.Board;
 import model.Move;
 import model.Piece;
+import model.pieces.King;
 import model.pieces.Pawn;
 import model.pieces.Queen;
 import model.pieces.Rook;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -20,14 +23,16 @@ public class TestGameBoard {
     @Test
     public void testUndoMove() {
         // Move pawn forward
-        Move move = new Move(board.findPieceByLocation(1, 0), 3,  0);
+        Pawn pawn = (Pawn) board.findPieceByLocation(1, 0);
+        Move move = new Move(pawn, 3,  0);
         board.movePiece(move);
 
         board.undoLastMove();
 
         assertNotNull("Pawn should be back at its original position", board.findPieceByLocation(1,0));
         assertNull("Pawn's new position should be empty after undo", board.findPieceByLocation(3,0));
-        assertTrue("Pawn's first move should be restore", board.findPieceByLocation(1,0).isFirstMove());
+        assertEquals("Pawn's should be back at its original position", board.findPieceByLocation(1,0), pawn);
+        assertTrue("Pawn's first move should be restore", pawn.getFirstMove());
     }
 
     @Test
@@ -65,21 +70,23 @@ public class TestGameBoard {
     @Test
     public void undoPawnPromotion() {
         Piece pawnToPromote = board.findPieceByLocation(1,2);
+        board.placePiece(pawnToPromote,6,2);
         Move move = new Move(pawnToPromote, 7, 1);
         board.movePiece(move);
         Piece newQueen = board.findPieceByLocation(7,1);
         board.undoLastMove();
 
         assertFalse("Last move should no longer exist", board.getLastMoves().contains(move));
-        assertEquals(1, pawnToPromote.getRow());
+        assertEquals(6, pawnToPromote.getRow());
         assertEquals(2, pawnToPromote.getCol());
         assertFalse("Queen should no long exist in board", board.getBlackPieces().contains(newQueen));
+        assertTrue("Pawn should exist in board", board.getAllPieces().contains(pawnToPromote));
         assertTrue("Pawn should exist in board", board.getBlackPieces().contains(pawnToPromote));
     }
 
     @Test
     public void testKingSideCastling() {
-        Piece king = board.getKing(false);
+        King king = (King) board.getKing(false);
         board.placePiece(null,0, 5);
         board.placePiece(null,0, 6);
         Move move = new Move(king,0, 6);
@@ -89,21 +96,59 @@ public class TestGameBoard {
         assertNull("Previous rook position should now be empty", board.findPieceByLocation(0, 7));
         assertEquals(king, board.findPieceByLocation(0,6));
         assertTrue("Rook should occupy position left of king", board.findPieceByLocation(0, 5) instanceof Rook);
-        assertFalse("King's First move should be false", king.isFirstMove());
-        assertFalse("Rook's First move should be false", board.findPieceByLocation(0, 5).isFirstMove());
+        assertFalse("King's First move should be false", king.getLastMoves().isEmpty());
+        assertFalse("Rook's First move should be false", ((Rook) board.findPieceByLocation(0, 5)).getLastMoves().isEmpty());
     }
 
     @Test
     public void undoQueenSideCastling() {
-        Piece king = board.getKing(false);
+        King king = (King) board.getKing(false);
         Move move = new Move(king,0, 2);
         board.movePiece(move);
         board.undoLastMove();
 
-        assertTrue("Rook should occupy position left of king", board.findPieceByLocation(0, 0) instanceof Rook);
+        assertTrue("Rook should be back in starting position", board.findPieceByLocation(0, 0) instanceof Rook);
         assertEquals(king, board.findPieceByLocation(0,4));
-        assertTrue("King's First move should be false", king.isFirstMove());
-        assertTrue("Rook's First move should be false", king.isFirstMove());
+        assertTrue("King's First move should be true",  king.getLastMoves().isEmpty());
+        assertTrue("Rook's First move should be true", ((Rook) board.findPieceByLocation(0, 0)).getLastMoves().isEmpty());
+    }
+
+    @Test
+    public void testCastlingAfterKingMove() {
+        King whiteKing = (King) board.findPieceByLocation(7, 4);
+        board.movePiece(new Move(whiteKing,4,4));
+        board.movePiece(new Move(whiteKing,7,4));
+
+        ArrayList<int[]> legalMoves = whiteKing.availableMoves(board);
+        // Assert that castling moves are not present
+        for (int[] move : legalMoves) {
+            assertFalse("Castling move should not be available after the king has moved.",move[1] == 6 || move[1] == 2);
+        }
+    }
+
+    @Test
+    public void PerftTest() {
+        TestMoveGeneration testMoveGen = new TestMoveGeneration();
+
+        int depth1 = 1;
+        int depth2 = 2;
+        int depth3 = 3;
+        int depth4 = 4;
+
+        int expectedPositionsDepth1 = 20;
+        int expectedPositionsDepth2 = 400;
+        int expectedPositionsDepth3 = 8902;
+        int expectedPositionsDepth4 = 197281;
+
+        int actualPositionsDepth1 = testMoveGen.MoveGenerationTest(depth1, true, board);
+        int actualPositionsDepth2 = testMoveGen.MoveGenerationTest(depth2, true, board);
+        int actualPositionsDepth3 = testMoveGen.MoveGenerationTest(depth3, true, board);
+        int actualPositionsDepth4 = testMoveGen.MoveGenerationTest(depth4, true, board);
+
+        assertEquals("The number of positions generated at depth 1 is incorrect", expectedPositionsDepth1, actualPositionsDepth1);
+        assertEquals("The number of positions generated at depth 2 is incorrect", expectedPositionsDepth2, actualPositionsDepth2);
+        assertEquals("The number of positions generated at depth 3 is incorrect", expectedPositionsDepth3, actualPositionsDepth3);
+        assertEquals("The number of positions generated at depth 4 is incorrect", expectedPositionsDepth4, actualPositionsDepth4);
     }
 
 }

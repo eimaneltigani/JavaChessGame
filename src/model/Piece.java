@@ -14,7 +14,6 @@ public abstract class Piece {
     String type;
     boolean isWhite;
     public int row, col;
-    protected boolean firstMove;
     public BufferedImage image;
 
     /**
@@ -29,7 +28,6 @@ public abstract class Piece {
         this.isWhite = isWhiteIn;
         this.col = col;
         this.row = row;
-        this.firstMove = true;
         char colorChar = isWhite ? 'w' : 'b';
         String imagePath = MessageFormat.format("/piece/{0}-{1}", colorChar, typeIn);
         this.image = getImage(imagePath);
@@ -86,14 +84,6 @@ public abstract class Piece {
 
     public boolean getOppositeColor() {
         return !this.isWhite;
-    }
-
-    public void setFirstMove(boolean b) {
-        firstMove = b;
-    }
-
-    public boolean isFirstMove() {
-        return firstMove;
     }
 
     public boolean isWithinBounds(int row, int col) {

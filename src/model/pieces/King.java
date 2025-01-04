@@ -4,6 +4,7 @@ import model.Move;
 import model.Piece;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * King rules - Moves one square in any direction
@@ -19,10 +20,11 @@ public class King extends Piece {
             {1, -1},  // Bottom-left
             {1, 1}    // Bottom-right
     };
-    boolean inCheck = false;
+    Stack<Move> lastMoves;
 
     public King(boolean isWhite, int col, int row) {
         super("king", isWhite, col, row);
+        lastMoves = new Stack<>();
     }
 
     @Override
@@ -52,7 +54,7 @@ public class King extends Piece {
         }
 
         // Check for castling
-        if(this.isFirstMove()) {
+        if(lastMoves.isEmpty()) {
             // Check Kingside castling
             if(canCastle(board, true)) {
                 int newCol = currCol + 2;
@@ -69,6 +71,7 @@ public class King extends Piece {
         return legalMoves;
     }
 
+
     // Castling rules - permitted only if neither king nor rook have previously moved
     // and squares between are vacant
     private boolean canCastle(Board board, boolean kingside) {
@@ -76,29 +79,34 @@ public class King extends Piece {
         int direction = kingside ? 1 : -1;
 
         // Check if rook hasn't moved
-        Piece rook = board.findPieceByLocation(row, rookCol);
-        if(!(rook instanceof Rook) || !rook.isFirstMove()) {
-            return false;
-        }
-
-        // Check that all squares between king & rook are empty
-        int currCol = col + direction;
-        while(currCol != rookCol) {
-            if(board.findPieceByLocation(row,currCol) != null) {
-                return false;
+        Piece p = board.findPieceByLocation(row, rookCol);
+        if(p instanceof Rook rook && rook.getLastMoves().isEmpty()) {
+            // Check that all squares between king & rook are empty
+            int nextCol = col + direction;
+            while(nextCol != rookCol) {
+                if(board.findPieceByLocation(row, nextCol) != null) {
+                    return false;
+                }
+                nextCol += direction;
             }
-            currCol += direction;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
-    public void markCheck(boolean inCheck) {
-        this.inCheck = inCheck;
+    public Stack<Move> getLastMoves() {
+        return lastMoves;
     }
 
-    public boolean inCheck() {
-        return inCheck;
+    public void addMove(Move move) {
+        lastMoves.add(move);
+    }
+
+    public void removeLastMove() {
+        if(!lastMoves.isEmpty()) {
+            lastMoves.pop();
+        }
     }
 
 }
