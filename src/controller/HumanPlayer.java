@@ -40,7 +40,6 @@ public class HumanPlayer implements Player, ClickListener {
         // enable clicks for user pieces
         HashMap<Piece, ArrayList<int[]>> availablePiecesToMove = board.getAllPossibleMoves(color);
         gui.enableUserClicks(availablePiecesToMove);
-        gui.setTurn(true);
 
         // wait until user finishes decision
         while (currentMove == null) {
@@ -130,6 +129,8 @@ public class HumanPlayer implements Player, ClickListener {
                 gui.showPromotionalPanel();
             }
         }
+
+        gui.setTurn(false);
     }
 
     @Override

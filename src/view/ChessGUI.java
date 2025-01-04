@@ -183,6 +183,7 @@ public class ChessGUI implements ActionListener {
             int col = p.getCol();
             buttons[row][col].setPiece(p);
         }
+        setTurn(true);
     }
 
     // Updates GUI based of last move
@@ -241,8 +242,8 @@ public class ChessGUI implements ActionListener {
             humanPanel.setBorder(new LineBorder(Color.GREEN, 3));
             computerPanel.setBorder(new LineBorder(Color.BLACK, 1));
         } else {
-            humanPanel.setBorder(new LineBorder(Color.GREEN, 3));
-            computerPanel.setBorder(new LineBorder(Color.BLACK, 1));
+            humanPanel.setBorder(new LineBorder(Color.BLACK, 1));
+            computerPanel.setBorder(new LineBorder(Color.GREEN, 3));
         }
     }
 
