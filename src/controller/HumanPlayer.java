@@ -102,6 +102,13 @@ public class HumanPlayer implements Player, ClickListener {
         // also made me think about what if checkmate, move would be equal to null here?
         b.movePiece(move);
 
+        Move castlingMove;
+        if(b.getLastMove()!=move) {
+            castlingMove = b.getLastMove();
+        } else {
+            castlingMove = null;
+        }
+
         SwingUtilities.invokeLater(() -> {
             gui.disableUserClicks();
             gui.removeHighlight(legalMoves);
@@ -109,7 +116,11 @@ public class HumanPlayer implements Player, ClickListener {
             if (move.isCaptured()) {
                 gui.updateCapturedPiecePanel(b.getCapturedPieces());
             }
+            if(castlingMove!=null) { // update extra castling move (rook)
+                gui.update(castlingMove);
+            }
         });
+
 
         // handle pawn promotion
         if(move.getPiece() instanceof Pawn && move.getTargetRow() == 0) {

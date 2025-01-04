@@ -6,10 +6,8 @@ import model.Piece;
 import view.ChessGUI;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Random;
+import javax.swing.Timer;
+import java.util.*;
 
 public class ComputerPlayer implements Player {
     ChessGUI gui;
@@ -27,34 +25,17 @@ public class ComputerPlayer implements Player {
         this.gui = gui;
     }
 
+    int depth = 3;
+
     public Move decideMove(Board board) {
         if (board.inCheck(color)) {
             gui.setCheck(board.getKing(color));
         }
-
         gui.setTurn(false);
-        HashMap<Piece, ArrayList<int[]>> bPieces = board.getAllPossibleMoves(color);
 
-        // choosing random play for now
-        Random r = new Random();
-        int pIndex = r.nextInt(bPieces.size());
-        int i = 0;
-        Piece randomP = null;
-        for(Piece key : bPieces.keySet()) {
-            if (i == pIndex) {
-                randomP = key;
-                break;
-            }
-            i++;
-        }
+        Move move = findBestMove(board);
 
-        ArrayList<int[]> pMoves = bPieces.get(randomP);
-        int mIndex = r.nextInt(pMoves.size());
-        int[] randomMove = pMoves.get(mIndex);
-        System.out.println(randomP);
-        System.out.println(Arrays.toString(randomMove));
-        currMove = new Move(randomP, randomMove[0], randomMove[1]);
-        return currMove;
+        return move;
     }
 
     public void update(Board b, Move move) {
@@ -63,6 +44,13 @@ public class ComputerPlayer implements Player {
         // Set delay, 1000ms = 1 second
         int delay = 1000;
 
+        Move castlingMove;
+        if(b.getLastMove()!=move) {
+            castlingMove = b.getLastMove();
+        } else {
+            castlingMove = null;
+        }
+
         // Create Timer
         Timer timer = new Timer(delay, e -> {
             // GUI update logic after the delay
@@ -70,6 +58,9 @@ public class ComputerPlayer implements Player {
                 gui.update(move);
                 if (move.isCaptured()) {
                     gui.updateCapturedPiecePanel(b.getCapturedPieces());
+                }
+                if(castlingMove!=null) { // update extra castling move (rook)
+                    gui.update(castlingMove);
                 }
             });
             // Stop the timer (only needed if the Timer is a one-shot timer)
@@ -86,5 +77,94 @@ public class ComputerPlayer implements Player {
     @Override
     public boolean getColor() {
         return color;
+    }
+
+    public static final int MAX = Integer.MAX_VALUE;
+    public static final int MIN = Integer.MIN_VALUE;
+
+    public Move findBestMove(Board board) {
+        int bestEval = MIN;
+        Move bestMove = null;
+
+        HashMap<Piece, ArrayList<int[]>> moves = board.getAllPossibleMoves(color);
+
+        for (Piece piece : moves.keySet()) {
+            ArrayList<int[]> pMoves = new ArrayList<>(moves.get(piece));
+            for (int[] move : pMoves) {
+                Move currMove = new Move(piece, move[0], move[1]);
+                board.movePiece(currMove);
+                int eval = minimax(board, depth - 1, false); // negative --> good for opponent = bad for us
+                board.undoLastMove();
+                if (eval > bestEval) {
+                    bestEval = eval;
+                    bestMove = currMove;
+                }
+            }
+        }
+
+        return bestMove;
+    }
+
+    private int minimax(Board board, int depth, boolean maximizingPLayer) {
+        if(depth == 0) {
+            return evaluateBoard(board);
+        }
+
+        if(maximizingPLayer) {
+            int maxEval = MIN;
+            HashMap<Piece, ArrayList<int[]>> moves = board.getAllPossibleMoves(color);
+            for (Piece p : moves.keySet()) {
+                ArrayList<int[]> pMoves = new ArrayList<>(moves.get(p));
+                for (int[] move : pMoves) {
+                    board.movePiece(new Move(p, move[0], move[1]));
+                    int eval = minimax(board, depth - 1, false); // negative --> good for opponent = bad for us
+                    board.undoLastMove();
+                    maxEval =  Math.max(maxEval, eval);
+                }
+            }
+            return maxEval;
+        } else {
+            int minEval = MAX;HashMap<Piece, ArrayList<int[]>> moves = board.getAllPossibleMoves(color);
+            for (Piece p : moves.keySet()) {
+                ArrayList<int[]> pMoves = new ArrayList<>(moves.get(p));
+                for (int[] move : pMoves) {
+                    board.movePiece(new Move(p, move[0], move[1]));
+                    int eval = minimax(board, depth - 1, false); // negative --> good for opponent = bad for us
+                    board.undoLastMove();
+                    minEval =  Math.min(minEval, eval);
+                }
+            }
+            return minEval;
+        }
+    }
+
+    Map<String, Integer> pieceValues = Map.of(
+            "pawn", 1,
+            "knight", 3,
+            "bishop", 3,
+            "rook", 5,
+            "queen", 9
+    );
+
+    public int evaluateBoard(Board board) {
+        int whiteEval = countMaterial(true, board);
+        int blackEval = countMaterial(false, board);
+
+        int evaluation = whiteEval - blackEval;
+
+        return evaluation;
+    }
+
+    public int countMaterial(boolean color, Board board) {
+        int totalValue = 0;
+        ArrayList<Piece> pieces = board.getPlayersPieces(color);
+        for(Piece piece : pieces) {
+            String pieceType = piece.getType();
+            if(pieceValues.containsKey(pieceType)) {
+                totalValue += pieceValues.get(pieceType);
+            }
+        }
+
+        return totalValue;
     }
 }

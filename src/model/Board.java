@@ -347,8 +347,16 @@ public class Board {
         return capturedPieces;
     }
 
+    public ArrayList<Piece> getPlayersPieces(boolean color) {
+        return color ? whitePieces : blackPieces;
+    }
+
     public Stack<Move> getLastMoves() {
         return lastMoves;
+    }
+
+    public Move getLastMove() {
+        return lastMoves.peek();
     }
 
     /** for testing purposes **/
@@ -363,5 +371,6 @@ public class Board {
     public Piece getKing(boolean color) {
         return color ? whiteKing : blackKing;
     }
+
 
 }
