@@ -1,5 +1,5 @@
 import model.Board;
-import controller.ComputerPlayer;
+import controller.AIPlayer;
 import controller.HumanPlayer;
 import controller.Player;
 import model.Move;
@@ -28,7 +28,7 @@ public class Main {
 
     public static void main(String[] args) {
         Player p1 = new HumanPlayer();
-        Player p2 = new ComputerPlayer();
+        Player p2 = new AIPlayer();
 
         startGame(p1, p2);
     }

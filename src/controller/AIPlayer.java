@@ -9,14 +9,14 @@ import javax.swing.*;
 import javax.swing.Timer;
 import java.util.*;
 
-public class ComputerPlayer implements Player {
+public class AIPlayer implements Player {
     ChessGUI gui;
     Piece selectedPiece;
     Board board;
     Move currMove;
     boolean color;
 
-    public ComputerPlayer() {
+    public AIPlayer() {
         this.color = false;
     }
 
@@ -33,9 +33,7 @@ public class ComputerPlayer implements Player {
         }
         gui.setTurn(false);
 
-        Move move = findBestMove(board);
-
-        return move;
+        return findBestMove(board);
     }
 
     public void update(Board b, Move move) {
@@ -70,8 +68,6 @@ public class ComputerPlayer implements Player {
         // Start the Timer
         timer.setRepeats(false); // Ensure the timer fires only once
         timer.start();
-
-        currMove = null;
     }
 
     @Override
@@ -81,6 +77,7 @@ public class ComputerPlayer implements Player {
 
     public static final int MAX = Integer.MAX_VALUE;
     public static final int MIN = Integer.MIN_VALUE;
+
 
     public Move findBestMove(Board board) {
         int bestEval = MIN;
@@ -105,11 +102,20 @@ public class ComputerPlayer implements Player {
         return bestMove;
     }
 
+
+    /**
+     * Search algorithm that traverses game tree to explore all possible moves for each player
+     *
+     * @return - evaluation of board, important to note we are not measuring moves
+     *             but rather the subsequent state reached by taking a particular move
+     */
     private int minimax(Board board, int depth, boolean maximizingPLayer) {
-        if(depth == 0) {
+        if (depth == 0) {
             return evaluateBoard(board);
         }
 
+        // Zero-sum game where opponents advantage = players disadvantage
+        // If players turn, return the highest possible outcome given a certain move
         if(maximizingPLayer) {
             int maxEval = MIN;
             HashMap<Piece, ArrayList<int[]>> moves = board.getAllPossibleMoves(color);
@@ -123,7 +129,7 @@ public class ComputerPlayer implements Player {
                 }
             }
             return maxEval;
-        } else {
+        } else { // Opponent will always play their strongest move (minimizing score)
             int minEval = MAX;HashMap<Piece, ArrayList<int[]>> moves = board.getAllPossibleMoves(color);
             for (Piece p : moves.keySet()) {
                 ArrayList<int[]> pMoves = new ArrayList<>(moves.get(p));
@@ -150,9 +156,7 @@ public class ComputerPlayer implements Player {
         int whiteEval = countMaterial(true, board);
         int blackEval = countMaterial(false, board);
 
-        int evaluation = whiteEval - blackEval;
-
-        return evaluation;
+        return whiteEval - blackEval;
     }
 
     public int countMaterial(boolean color, Board board) {
