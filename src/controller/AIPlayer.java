@@ -44,7 +44,7 @@ public class AIPlayer implements Player {
         }
 
         // Find the best move
-        currMove = findBestMove(board);
+        currMove = getBestMoveMinimax(board);
 
         return currMove;
     }
@@ -98,9 +98,17 @@ public class AIPlayer implements Player {
     public static final int MIN = Integer.MIN_VALUE;
 
 
-    public Move findBestMove(Board board) {
+    public long totalTime = 0;
+    public long totalNodes = 0;
+
+
+    public Move getBestMoveMinimax(Board board) {
         int bestEval = MIN;
         Move bestMove = null;
+
+        long start = System.nanoTime();
+        totalNodes = 0;
+        totalTime = 0;
 
         HashMap<Piece, ArrayList<int[]>> moves = board.getAllPossibleMoves(color);
 
@@ -109,7 +117,7 @@ public class AIPlayer implements Player {
             for (int[] move : pMoves) {
                 Move currMove = new Move(piece, move[0], move[1]);
                 board.movePiece(currMove);
-                int eval = minimax(board, depth - 1, false); // negative --> good for opponent = bad for us
+                int eval = minimax(board, depth - 1, color); // negative --> good for opponent = bad for us
                 board.undoLastMove();
                 if (eval > bestEval) {
                     bestEval = eval;
@@ -117,6 +125,36 @@ public class AIPlayer implements Player {
                 }
             }
         }
+
+        totalTime = (System.nanoTime() - start);
+
+        return bestMove;
+    }
+
+    public Move getBestMoveAlphaBeta(Board board) {
+        long start = System.nanoTime();
+        totalNodes = 0;
+        totalTime = 0;
+        Move bestMove = null;
+        int alpha = MIN;
+
+        HashMap<Piece, ArrayList<int[]>> moves = board.getAllPossibleMoves(color);
+
+        for (Piece piece : moves.keySet()) {
+            ArrayList<int[]> pMoves = new ArrayList<>(moves.get(piece));
+            for (int[] move : pMoves) {
+                Move currMove = new Move(piece, move[0], move[1]);
+                board.movePiece(currMove);
+                int score = negamax(board, depth - 1, -alpha - 1, -alpha, color); // negative --> good for opponent = bad for us
+                board.undoLastMove();
+                if (score > alpha) {
+                    alpha = score;
+                    bestMove = currMove;
+                }
+            }
+        }
+
+        totalTime = (System.nanoTime() - start);
 
         return bestMove;
     }
@@ -130,6 +168,7 @@ public class AIPlayer implements Player {
      *           Returns best score based on opponents move if possible, or heuristic value if exact value not possible.
      */
     private int minimax(Board board, int depth, boolean maximizingPLayer) {
+        totalNodes++;
         if (depth == 0) {
             return evaluateBoard(board);
         }
@@ -172,7 +211,9 @@ public class AIPlayer implements Player {
      * @return - Evaluation score viewed from perspective of side to move. Negates return value
      *            to reflect change and perspective of successor
      */
-    public int negamax(int depth, int alpha, int beta, boolean color) {
+    public int negamax(Board board, int depth, int alpha, int beta, boolean color) {
+        totalNodes++;
+
         if (depth == 0) {
             return negaEvaluation(board, color);
         }
@@ -190,7 +231,7 @@ public class AIPlayer implements Player {
             ArrayList<int[]> pMoves = new ArrayList<>(moves.get(p));
             for (int[] move : pMoves) {
                 board.movePiece(new Move(p, move[0], move[1]));
-                int eval = - negamax( depth - 1, -beta, -alpha, !color); // negative --> good for opponent = bad for us
+                int eval = - negamax(board, depth - 1, -beta, -alpha, !color); // negative --> good for opponent = bad for us
                 board.undoLastMove();
                 if (eval >= beta) {
                     // Move too good, opponent will avoid this position

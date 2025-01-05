@@ -1,3 +1,5 @@
+import controller.AIPlayer;
+import controller.Player;
 import model.Board;
 import model.Move;
 import model.Piece;
@@ -146,6 +148,24 @@ public class TestGameBoard {
         assertEquals("The number of positions generated at depth 2 is incorrect", expectedPositionsDepth2, actualPositionsDepth2);
         assertEquals("The number of positions generated at depth 3 is incorrect", expectedPositionsDepth3, actualPositionsDepth3);
         assertEquals("The number of positions generated at depth 4 is incorrect", expectedPositionsDepth4, actualPositionsDepth4);
+    }
+
+    @Test
+    public void testMinMaxSearchPerformance() {
+        Player ai = new AIPlayer();
+        ((AIPlayer) ai).getBestMoveMinimax(board);
+
+        System.out.println("Results for minimax search:");
+        System.out.println(((AIPlayer) ai).totalNodes + " nodes searched in " + ((AIPlayer) ai).totalTime);
+    }
+
+    @Test
+    public void testNegamaxSearchPerformance() {
+        Player ai = new AIPlayer();
+        ((AIPlayer) ai).getBestMoveAlphaBeta(board);
+
+        System.out.println("Results for minimax search:");
+        System.out.println(((AIPlayer) ai).totalNodes + " nodes searched in " + ((AIPlayer) ai).totalTime);
     }
 
 }
