@@ -262,6 +262,11 @@ public class Board {
             opponentPieces.add(capturedPiece);
             capturedPieces.remove(capturedPiece);
         }
+        // if promotion, bring back pawn
+        if (isPromotePawn(lastMove)) {
+            playerPieces.add(movedPiece);
+            allPieces.add(movedPiece);
+        }
 
         // restore piece position and board
         movedPiece.setRow(prevRow);
@@ -288,9 +293,6 @@ public class Board {
             allPieces.remove(movedPiece);
             playerPieces.remove(movedPiece);
             undoLastMove();
-        } else if (isPromotePawn(lastMove)) { // if original pawn, add back to board
-            playerPieces.add(movedPiece);
-            allPieces.add(movedPiece);
         }
     }
 
@@ -373,10 +375,6 @@ public class Board {
 
     /** for testing purposes **/
     public void placePiece(Piece p, int row, int col) {
-        if(p!=null) {
-            p.setRow(row);
-            p.setCol(col);
-        }
         board[row][col] = p;
     }
 

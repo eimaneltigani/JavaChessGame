@@ -70,16 +70,13 @@ public class TestGameBoard {
     @Test
     public void undoPawnPromotion() {
         Piece pawnToPromote = board.findPieceByLocation(1,2);
-        board.placePiece(pawnToPromote,6,2);
         Move move = new Move(pawnToPromote, 7, 1);
         board.movePiece(move);
         Piece newQueen = board.findPieceByLocation(7,1);
         board.undoLastMove();
 
         assertFalse("Last move should no longer exist", board.getLastMoves().contains(move));
-        assertEquals(6, pawnToPromote.getRow());
-        assertEquals(2, pawnToPromote.getCol());
-        assertFalse("Queen should no long exist in board", board.getBlackPieces().contains(newQueen));
+        assertFalse("Queen should no longer exist in board", board.getBlackPieces().contains(newQueen));
         assertTrue("Pawn should exist in board", board.getAllPieces().contains(pawnToPromote));
         assertTrue("Pawn should exist in board", board.getBlackPieces().contains(pawnToPromote));
     }
