@@ -178,9 +178,9 @@ public class Board {
                 opponentPieces.remove(capturedPiece);
                 capturedPieces.add(capturedPiece);
             } else { // replacing own piece - pawn promotion
-                playerPieces.remove(capturedPiece); // remove pawn
                 playerPieces.add(p); // add queen or whatever promotion
                 allPieces.add(p);
+                playerPieces.remove(capturedPiece); // remove pawn
             }
             allPieces.remove(capturedPiece);
         }
@@ -193,8 +193,7 @@ public class Board {
         lastMoves.add(move);
 
 
-
-        /* Handle updates for pieces where tracking first move matters **/
+        // Keep track of first move if King, Rook, or Pawn
         if (p instanceof King king) {
             king.addMove(move);
         } else if (p instanceof Rook rook) {
@@ -204,10 +203,10 @@ public class Board {
         }
 
 
-
         /* Handling special cases that require an additional move  **/
+
         // 1. Castling, create and process additional move for Rook
-        if (p instanceof King && Math.abs(targetCol - currCol) == 2) {
+        if (isCastling(move)) {
             boolean kingside = targetCol > currCol;
             int rookCurrCol = kingside ? 7 : 0;
             int rookTargetCol = kingside ? targetCol-1 : targetCol+1;
@@ -216,12 +215,29 @@ public class Board {
         }
 
         // 2. Handle extra promotion move for computer
-        // Note - Don't need to do it for Human Player because it's handled in controller since user must select piece first
-        if (p instanceof Pawn && !p.isWhite() && p.getRow() == 7) {
+        // Note - Don't need to do it for Human Player because it'll be passed in controller since user must select piece first
+        if (!p.isWhite() && isPromotePawn(move)) {
             // computer picks Queen everytime
             Piece newPiece = new Queen(false, targetRow, targetCol);
             movePiece(new Move(newPiece, targetRow, targetCol));
         }
+    }
+
+    public boolean isCastling(Move move) {
+        Piece p = move.getPiece();
+        int currCol = move.getCurrCol();
+        int targetCol = move.getTargetCol();
+
+        return p instanceof King && Math.abs(targetCol - currCol) == 2;
+    }
+
+    // this is first move of promotion where pawn reaches end of board
+    public boolean isPromotePawn(Move move) {
+        Piece p = move.getPiece();
+        boolean color = p.isWhite();
+        int expectedRow = color ? 0 : 7;
+
+        return p instanceof Pawn && p.getRow() == expectedRow;
     }
 
     public void undoLastMove() {
@@ -244,7 +260,6 @@ public class Board {
 
             allPieces.add(capturedPiece);
             opponentPieces.add(capturedPiece);
-
             capturedPieces.remove(capturedPiece);
         }
 
@@ -259,27 +274,24 @@ public class Board {
         if(movedPiece instanceof Pawn pawn) {
             if((prevRow == 1 && !movedPiece.isWhite()) || (prevRow == 6 && movedPiece.isWhite())) {
                 pawn.setFirstMove(true);
-            } else if (currRow == 7 || currRow == 0) { // pawn promo
-                playerPieces.add(movedPiece);
-                allPieces.add(movedPiece);
             }
         } else if (movedPiece instanceof King king) {
             king.removeLastMove();
-        } else if(movedPiece instanceof Rook rook) {
+        } else if (movedPiece instanceof Rook rook) {
             rook.removeLastMove();
         }
 
         // undo both moves for special cases
-        if(prevRow == currRow && prevCol == currCol) { // if pawn upgrading
-            allPieces.remove(movedPiece); // remove queen
+        if(movedPiece instanceof Rook && !lastMoves.isEmpty() && isCastling(lastMoves.peek())) { // castling
+            undoLastMove();
+        } else if(prevRow == currRow && prevCol == currCol) { // if pawn upgrade, remove promotion piece and undo move
+            allPieces.remove(movedPiece);
             playerPieces.remove(movedPiece);
             undoLastMove();
-        } else if(movedPiece instanceof Rook && !lastMoves.isEmpty() &&
-                lastMoves.peek().getPiece() instanceof King &&
-                Math.abs(lastMoves.peek().getTargetCol() - lastMoves.peek().getCurrCol())==2) { // castling
-            undoLastMove();
+        } else if (isPromotePawn(lastMove)) { // if original pawn, add back to board
+            playerPieces.add(movedPiece);
+            allPieces.add(movedPiece);
         }
-
     }
 
     public boolean inCheck(boolean isWhite) {

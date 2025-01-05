@@ -24,7 +24,6 @@ public class PieceButton extends JButton {
         this.tileColor = color;
         this.backgroundColor = tileColor;
         setBackground(backgroundColor);
-//        setBorderPainted(false); // Remove border for a cleaner look
         setFocusPainted(false);  // Prevent focus outline
         setContentAreaFilled(false); // Let paintComponent handle the background
     }

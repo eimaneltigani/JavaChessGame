@@ -6,15 +6,14 @@ import model.Piece;
 import view.ChessGUI;
 
 import javax.swing.*;
-import javax.swing.Timer;
 import java.util.*;
 
 public class AIPlayer implements Player {
     ChessGUI gui;
-    Piece selectedPiece;
     Board board;
     Move currMove;
     boolean color;
+    boolean inCheck;
 
     public AIPlayer() {
         this.color = false;
@@ -28,52 +27,66 @@ public class AIPlayer implements Player {
     int depth = 3;
 
     public Move decideMove(Board board) {
-
         if (board.inCheck(color)) {
+            inCheck = true;
             gui.setCheck(board.getKing(color));
-        } else {
-            ArrayList<int[]> kingsPosition = new ArrayList<>();
-            kingsPosition.add(new int[]{board.getKing(color).getRow(), board.getKing(color).getCol()});
-            gui.removeHighlight(kingsPosition);
         }
 
-        return findBestMove(board);
+        // Set delay in milliseconds (1000ms = 1 second)
+        int delay = 600;
+
+        // Create delay for a more natural user experience
+        try {
+            Thread.sleep(delay); // Pause for the specified delay
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Restore interrupted status
+            e.printStackTrace();
+        }
+
+        // Find the best move
+        currMove = findBestMove(board);
+
+        return currMove;
     }
 
     public void update(Board b, Move move) {
-
+        // Update model
         b.movePiece(move);
 
-        // Set delay, 1000ms = 1 second
-        int delay = 1000;
+        // Update view
+        SwingUtilities.invokeLater(() -> {
+            gui.update(move);
+            if (move.isCaptured()) {
+                gui.updateCapturedPiecePanel(b.getCapturedPieces());
+            }
 
-        Move castlingMove;
-        if(b.getLastMove()!=move) {
-            castlingMove = b.getLastMove();
-        } else {
-            castlingMove = null;
-        }
+            // If castling, update additional rook move
+            if(b.isCastling(move)) {
+                Move castlingMove = b.getLastMove();
+                gui.update(castlingMove);
+            }
 
-        // Create Timer
-        Timer timer = new Timer(delay, e -> {
-            // GUI update logic after the delay
-            SwingUtilities.invokeLater(() -> {
-                gui.update(move);
-                if (move.isCaptured()) {
-                    gui.updateCapturedPiecePanel(b.getCapturedPieces());
+            // update extra pawn promotion move
+            if(b.isPromotePawn(move)) {
+                gui.update(b.getLastMove());
+            }
+
+            // undo previous check highlight
+            if(inCheck) {
+                Piece king = b.getKing(color);
+                ArrayList<int[]> kingsPosition = new ArrayList<>();
+                // If King moved, need to find its previous panel
+                if(move.getPiece() == king) {
+                    kingsPosition.add(new int[]{move.getCurrRow(), move.getCurrCol()});
+                } else {
+                    kingsPosition.add(new int[]{king.getRow(),king.getCol()});
                 }
-                if(castlingMove!=null) { // update extra castling move (rook)
-                    gui.update(castlingMove);
-                }
-                gui.setTurn(true); // Switch to users turn
-            });
-            // Stop the timer (only needed if the Timer is a one-shot timer)
-            ((Timer) e.getSource()).stop();
+                gui.removeHighlight(kingsPosition);
+                inCheck = false;
+            }
+
+            gui.setTurn(true); // Switch to users turn
         });
-
-        // Start the Timer
-        timer.setRepeats(false); // Ensure the timer fires only once
-        timer.start();
     }
 
     @Override
@@ -113,7 +126,7 @@ public class AIPlayer implements Player {
      * Search algorithm that traverses game tree to explore all possible moves for each player
      * Note: Not efficient due to the excessive branching factor of ~ 35 on average for possible chess paths
      *
-     * @return - Evaluation of board where score is always evaluated from single players POV
+     * @return - Score evaluated from single players POV
      *           Returns best score based on opponents move if possible, or heuristic value if exact value not possible.
      */
     private int minimax(Board board, int depth, boolean maximizingPLayer) {
@@ -121,7 +134,6 @@ public class AIPlayer implements Player {
             return evaluateBoard(board);
         }
 
-        // Zero-sum game where opponents advantage = players disadvantage
         // If players turn, return the highest possible outcome given a certain move
         if(maximizingPLayer) {
             int maxEval = MIN;
@@ -149,13 +161,13 @@ public class AIPlayer implements Player {
                 }
             }
 
-            return minEval; // Positive mean player winning, negative mean opponent winning
+            return minEval;
         }
     }
 
     /**
      * Negamax is slightly optimized of min-max that flips score rather than writing two separate functions
-     * Alpha Beta works by eliminating
+     * Alpha Beta works by eliminating nodes that cannot beat already analyzed positions at tree level
      *
      * @return - Evaluation score viewed from perspective of side to move. Negates return value
      *            to reflect change and perspective of successor

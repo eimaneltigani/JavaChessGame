@@ -41,7 +41,7 @@ public class ChessGUI implements ActionListener {
     // Create separate interface to handle click actions
     public interface ClickListener {
 
-        void onClick(int row, int col, boolean captured);
+        void onClick(int row, int col);
         void handlePromotionSelection(String piece);
 
     }
@@ -84,6 +84,8 @@ public class ChessGUI implements ActionListener {
         window.setLocationRelativeTo(null); // window will show up at center of monitor
         window.setVisible(true);
     }
+
+    /** Private methods to configure GUI components **/
 
     // Draw 8x8 board with alternating colors for each tile
     private void configureBoardPanel() {
@@ -150,6 +152,7 @@ public class ChessGUI implements ActionListener {
         sidePanel.add(piecePanel, BorderLayout.SOUTH);
     }
 
+    // Top right panel will display both players
     private JPanel createPlayerPanel(String playerName, String iconPath) {
         JPanel playerPanel = new JPanel(new GridBagLayout());
         playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
@@ -175,7 +178,9 @@ public class ChessGUI implements ActionListener {
     }
 
 
-    // GUI board initialized after model creation (called within Main)
+    /* Public methods to modify view **/
+
+    // Draw pieces on board initialized after model creation (called within Main)
     public void initializeBoard(Board board) {
         ArrayList<Piece> allPieces = board.getAllPieces();
         for (Piece p : allPieces) {
@@ -185,6 +190,8 @@ public class ChessGUI implements ActionListener {
         }
         setTurn(true);
     }
+
+    /* Methods to be called by both Human and AI Player classes after updating model **/
 
     // Updates GUI based of last move
     public void update(Move move) {
@@ -237,6 +244,15 @@ public class ChessGUI implements ActionListener {
         piecePanel.revalidate();
     }
 
+    public void setCheck(Piece king) {
+        int row = king.getRow();
+        int col = king.getCol();
+
+        // find coordinating piece button
+        PieceButton button = buttons[row][col];
+        button.changeBackground(Color.RED);
+    }
+
     public void setTurn(boolean player) {
         if (player) {
             humanPanel.setBorder(new LineBorder(Color.GREEN, 3));
@@ -247,6 +263,7 @@ public class ChessGUI implements ActionListener {
         }
     }
 
+    /* Below functions are only called in user class to enable user interaction **/
 
     // A function that highlights the possible moves after user click specified piece
     public void highlightLegalMoves(ArrayList<int[]> legalMoves) {
@@ -263,7 +280,7 @@ public class ChessGUI implements ActionListener {
         }
     }
 
-    // Remove previous highlights after user is finished picking their move
+    // Remove previous highlights after user is finished picking their move or no longer in check
     public void removeHighlight(ArrayList<int[]> legalMoves) {
         for (int[] move : legalMoves) {
             int x = move[0];
@@ -272,15 +289,6 @@ public class ChessGUI implements ActionListener {
             button.removeHighlight();
             button.setEnabled(false);
         }
-    }
-
-    public void setCheck(Piece king) {
-        int row = king.getRow();
-        int col = king.getCol();
-
-        // find coordinating piece button
-        PieceButton button = buttons[row][col];
-        button.changeBackground(Color.RED);
     }
 
     // Display promotion box for user
@@ -313,7 +321,7 @@ public class ChessGUI implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        if (promotionIsVisible) {
+        if (promotionIsVisible) { // handle pawn promotion
             JButton clickedButton = (JButton) e.getSource();
             String buttonName = clickedButton.getText();
             System.out.println("You clicked promotional button for: " + buttonName);
@@ -322,17 +330,13 @@ public class ChessGUI implements ActionListener {
             }
             promotionalPanel.setVisible(false); // Hide after selection
             promotionIsVisible = false;
-        } else {
+        } else { // handle rest of game selections
             PieceButton clickedButton = (PieceButton) e.getSource();
             int row = clickedButton.row;
             int col = clickedButton.col;
-            boolean captured = false;
-            if (clickedButton.getPiece()!=null && clickedButton.getPiece().isWhite()==false) {
-                captured = true;
-            }
 
             if (clickListener != null) {
-                clickListener.onClick(row, col, captured);
+                clickListener.onClick(row, col);
             }
         }
 

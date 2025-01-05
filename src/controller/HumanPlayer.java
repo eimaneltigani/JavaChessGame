@@ -19,6 +19,7 @@ public class HumanPlayer implements Player, ClickListener {
     Move currentMove;
     boolean handlingPromotion;
     boolean color;
+    boolean inCheck;
 
     public HumanPlayer() {
         this.color = true;
@@ -34,6 +35,7 @@ public class HumanPlayer implements Player, ClickListener {
         selectedPiece = null;
 
         if (board.inCheck(color)) {
+            inCheck = true;
             gui.setCheck(board.getKing(color));
         }
 
@@ -56,7 +58,7 @@ public class HumanPlayer implements Player, ClickListener {
     }
 
     @Override
-    public void onClick(int row, int col, boolean captured) {
+    public void onClick(int row, int col) {
         Piece piece = board.findPieceByLocation(row, col);
 
         // If selecting piece for first time
@@ -92,45 +94,52 @@ public class HumanPlayer implements Player, ClickListener {
         board.movePiece(promotionalMove);
         gui.update(promotionalMove);
         handlingPromotion = false;
-
     }
 
 
     public void update(Board b, Move move) {
-        // need to deactivate red background if king WAS in check last round but no longer is
-        // also made me think about what if checkmate, move would be equal to null here?
+        // Update model board
         b.movePiece(move);
 
-        Move castlingMove;
-        if(b.getLastMove()!=move) {
-            castlingMove = b.getLastMove();
-        } else {
-            castlingMove = null;
-        }
-
+        // Update GUI
         SwingUtilities.invokeLater(() -> {
             gui.disableUserClicks();
             gui.removeHighlight(legalMoves);
             gui.update(move);
+
+            // If captured, remove piece from board
             if (move.isCaptured()) {
                 gui.updateCapturedPiecePanel(b.getCapturedPieces());
             }
-            if(castlingMove!=null) { // update extra castling move (rook)
+            // If castling, update additional rook move
+            if(b.isCastling(move)) {
+                Move castlingMove = b.getLastMove();
                 gui.update(castlingMove);
             }
-        });
-
-
-        // handle pawn promotion
-        if(move.getPiece() instanceof Pawn && move.getTargetRow() == 0) {
-            handlingPromotion = true;
-            while (handlingPromotion) {
-                currentMove = move;
-                gui.showPromotionalPanel();
+            // if pawn promotion, display options panel to let user pick new piece/move
+            if(b.isPromotePawn(move)) {
+                handlingPromotion = true;
+                while (handlingPromotion) {
+                    currentMove = move;
+                    gui.showPromotionalPanel();
+                }
             }
-        }
+            // If king was in check, undo check
+            if(inCheck) {
+                Piece king = b.getKing(color);
+                ArrayList<int[]> kingsPosition = new ArrayList<>();
+                // If King moved, need to find its previous panel
+                if(move.getPiece() == king) {
+                    kingsPosition.add(new int[]{move.getCurrRow(), move.getCurrCol()});
+                } else {
+                    kingsPosition.add(new int[]{king.getRow(),king.getCol()});
+                }
+                gui.removeHighlight(kingsPosition);
+                inCheck = false;
+            }
 
-        gui.setTurn(false);
+            gui.setTurn(false); // switch to Computer player
+        });
     }
 
     @Override
