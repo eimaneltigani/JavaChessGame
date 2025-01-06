@@ -1,5 +1,7 @@
 # Java Chess Game - Human vs AI
 
+![Chess](res/ChessScreenshot.png)
+
 ## The GUI
 Built using Java Swing with simple and easy-to-use features:
 * Available moves are highlighted after user-click
@@ -18,4 +20,10 @@ Considering the large branching factor (~35) estimated for chess, Alpha-Beta pru
 For example, consider the diagram below:
 
 ![Pruning example](https://media.geeksforgeeks.org/wp-content/uploads/MIN_MAX2.jpg)
-After returning all of the possible outcomes at the base of the tree, it is now the Maximizing players turn to pick their move. For Node D, they will choose the highest score of 5. For Node E, despite having a higher outcome, we know parent node B will choose the lowest value D regardless. As a result, no further search is necessary! 
+
+After returning all the possible outcomes at the base of the tree, it is now the Maximizing players turn to pick their move. For Node D, they will choose the highest score of 5. For Node E, despite having a higher outcome, we know parent node B will choose the lowest value D regardless. As a result, no further search is necessary!
+
+|                | MiniMax      | Second Header |
+|----------------|--------------| ------------- |
+| Nodes reached: | Content Cell | Content Cell  |
+| Time elapsed:  | Content Cell | Content Cell  |

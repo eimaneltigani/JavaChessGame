@@ -184,6 +184,7 @@ public class ChessGUI implements ActionListener {
         titleLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setVerticalAlignment(SwingConstants.CENTER);
+        titlePanel.setBackground(Color.GRAY);
         titlePanel.add(titleLabel);
 
         piecePanel.add(titlePanel, BorderLayout.NORTH);
@@ -222,6 +223,8 @@ public class ChessGUI implements ActionListener {
 //            capturedCount.setHorizontalAlignment(SwingConstants.RIGHT);
             capturedCount.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
             piecePanel.add(capturedCount, BorderLayout.NORTH);
+
+            piecePanel.setBackground(Color.GRAY);
 
             column.add(piecePanel);
 
