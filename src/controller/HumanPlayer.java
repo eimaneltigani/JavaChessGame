@@ -15,7 +15,7 @@ public class HumanPlayer implements Player, ClickListener {
     ChessGUI gui;
     Board board;
     Piece selectedPiece;
-    ArrayList<int[]> legalMoves;
+    HashMap<Piece, ArrayList<int[]>> availablePiecesToMove;
     Move currentMove;
     boolean handlingPromotion;
     boolean color;
@@ -40,7 +40,7 @@ public class HumanPlayer implements Player, ClickListener {
         }
 
         // enable clicks for user pieces
-        HashMap<Piece, ArrayList<int[]>> availablePiecesToMove = board.getAllPossibleMoves(color);
+        availablePiecesToMove = board.getAllPossibleMoves(color);
         gui.enableUserClicks(availablePiecesToMove);
 
         // wait until user finishes decision
@@ -64,14 +64,12 @@ public class HumanPlayer implements Player, ClickListener {
         // If selecting piece for first time
         if (selectedPiece == null && piece.isWhite()) {
             selectedPiece = piece;
-            legalMoves = new ArrayList<>(selectedPiece.availableMoves(board));
-            gui.highlightLegalMoves(legalMoves);
+            gui.highlightLegalMoves(availablePiecesToMove.get(selectedPiece));
         } else if (piece!= null && piece.isWhite()) {
             // if user is selecting another piece to move
-            gui.removeHighlight(legalMoves);
+            gui.removeHighlight(availablePiecesToMove.get(selectedPiece));
             selectedPiece = piece;
-            legalMoves = new ArrayList<>(selectedPiece.availableMoves(board));
-            gui.highlightLegalMoves(legalMoves);
+            gui.highlightLegalMoves(availablePiecesToMove.get(selectedPiece));
         } else {
             currentMove = new Move(selectedPiece, row, col);
         }
@@ -104,7 +102,7 @@ public class HumanPlayer implements Player, ClickListener {
         // Update GUI
         SwingUtilities.invokeLater(() -> {
             gui.disableUserClicks();
-            gui.removeHighlight(legalMoves);
+            gui.removeHighlight(availablePiecesToMove.get(selectedPiece));
             gui.update(move);
 
             // If captured, remove piece from board
