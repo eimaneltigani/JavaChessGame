@@ -57,7 +57,7 @@ public class AIPlayer implements Player {
         SwingUtilities.invokeLater(() -> {
             gui.update(move);
             if (move.isCaptured()) {
-                gui.updateCapturedPiecePanel(b.getCapturedPieces());
+                gui.updateCapturedPanel(b.getCapturedPieces());
             }
 
             // If castling, update additional rook move

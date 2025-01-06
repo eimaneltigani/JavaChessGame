@@ -107,7 +107,7 @@ public class HumanPlayer implements Player, ClickListener {
 
             // If captured, remove piece from board
             if (move.isCaptured()) {
-                gui.updateCapturedPiecePanel(b.getCapturedPieces());
+                gui.updateCapturedPanel(b.getCapturedPieces());
             }
             // If castling, update additional rook move
             if(b.isCastling(move)) {

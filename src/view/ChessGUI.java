@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * The main view of the chess game.
@@ -146,7 +147,8 @@ public class ChessGUI implements ActionListener {
         // Lower side panel displays captured pieces
         piecePanel = new JPanel();
         piecePanel.setPreferredSize(new Dimension(300,600));
-        piecePanel.setLayout(new GridLayout(1,2));
+        piecePanel.setLayout(new BorderLayout());
+        configureCapturedPanel();
 
         sidePanel.add(playerPanel, BorderLayout.NORTH);
         sidePanel.add(piecePanel, BorderLayout.SOUTH);
@@ -175,6 +177,63 @@ public class ChessGUI implements ActionListener {
         // Add padding and set initial border
         playerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         return playerPanel;
+    }
+
+    private void configureCapturedPanel() {
+        JPanel titlePanel = new JPanel();
+        titlePanel.setPreferredSize(new Dimension(300, 100));
+//        titlePanel.setBackground(Color.LIGHT_GRAY);
+
+        JLabel titleLabel = new JLabel("Captured:");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setVerticalAlignment(SwingConstants.CENTER);
+        titlePanel.add(titleLabel);
+
+        piecePanel.add(titlePanel, BorderLayout.NORTH);
+
+        JPanel columnsPanel = new JPanel(new GridLayout(1,2));
+        JPanel whitePanel = createCapturedColumn('w', 0);
+        JPanel blackPanel = createCapturedColumn('b', 1);
+        columnsPanel.add(whitePanel);
+        columnsPanel.add(blackPanel);
+
+        piecePanel.add(columnsPanel, BorderLayout.CENTER);
+    }
+
+    JLabel[][] capturedCountLabels = new JLabel[2][5];
+    String[] pieceNames = {"pawn", "knight", "bishop", "rook", "queen"};
+
+    private JPanel createCapturedColumn(char color, int row) {
+        JPanel column = new JPanel(new GridLayout(5, 1));
+
+        for (int i = 0; i <pieceNames.length; i++) {
+            JPanel piecePanel = new JPanel();
+            piecePanel.setLayout(new BorderLayout());
+
+            // Add piece image
+            JLabel pieceIcon = new JLabel();
+            pieceIcon.setHorizontalAlignment(SwingConstants.CENTER);
+            String imagePath = "res/piece/" + color + "-" + pieceNames[i] + ".png";
+            ImageIcon originalImage = new ImageIcon(imagePath);
+            Image scaledImage = originalImage.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
+            pieceIcon.setIcon(new ImageIcon(scaledImage)); // Get an icon for the piece
+            piecePanel.add(pieceIcon, BorderLayout.CENTER);
+
+            JLabel capturedCount = new JLabel("0");
+            capturedCount.setFont(new Font("Arial", Font.BOLD, 20));
+            capturedCount.setForeground(Color.DARK_GRAY);
+//            capturedCount.setHorizontalAlignment(SwingConstants.RIGHT);
+            capturedCount.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
+            piecePanel.add(capturedCount, BorderLayout.NORTH);
+
+            column.add(piecePanel);
+
+            capturedCountLabels[row][i] = capturedCount;
+        }
+
+        return column;
     }
 
 
@@ -206,43 +265,74 @@ public class ChessGUI implements ActionListener {
         buttons[endRow][endCol].setPiece(pieceMoved);
     }
 
+
     // Updates captured piece panel after each kill
-    public void updateCapturedPiecePanel(ArrayList<Piece> capturedPieces) {
-        JPanel whitePanel1 = new JPanel();
-        whitePanel1.setLayout(new BoxLayout(whitePanel1, BoxLayout.Y_AXIS));
-        JPanel blackPanel1 = new JPanel();
-        blackPanel1.setLayout(new BoxLayout(blackPanel1, BoxLayout.Y_AXIS));
+    public void updateCapturedPanel(ArrayList<Piece> capturedPieces) {
+        int[][] capturedCount = new int[2][5];
 
-        ArrayList<Piece> capturedWhite = new ArrayList<>();
-        ArrayList<Piece> capturedBlack = new ArrayList<>();
+        for(Piece p : capturedPieces) {
+            if(Objects.equals(p.getType(), "king")) {
+                continue;
+            }
+            int row = p.isWhite() ? 0 : 1;
+            int col = switch (p.getType()) {
+                case "pawn" -> 0;
+                case "knight" -> 1;
+                case "bishop" -> 2;
+                case "rook" -> 3;
+                case "queen" -> 4;
+                default -> throw new IllegalStateException("Unexpected value: " + p.getType());
+            };
 
-        for (Piece p : capturedPieces) {
-            if(p.isWhite()) {
-                capturedWhite.add(p);
-            } else {
-                capturedBlack.add(p);
+            capturedCount[row][col]++;
+        }
+
+        for(int i = 0; i < 2; i++) {
+            for(int j = 0; j < 5; j++) {
+                int count = capturedCount[i][j];
+                capturedCountLabels[i][j].setText(String.valueOf(count));
             }
         }
-
-        for(Piece p : capturedWhite) {
-            ImageIcon imageIcon = new ImageIcon(p.image);
-            JLabel label = new JLabel(imageIcon);
-            whitePanel1.add(label);
-        }
-
-        for(Piece p : capturedBlack) {
-            ImageIcon imageIcon = new ImageIcon(p.image);
-            JLabel label = new JLabel(imageIcon);
-            blackPanel1.add(label);
-        }
-
-        piecePanel.removeAll();
-        piecePanel.add(whitePanel1);
-        piecePanel.add(blackPanel1);
-
-        piecePanel.repaint();
-        piecePanel.revalidate();
     }
+
+
+    // Updates captured piece panel after each kill
+//    public void updateCapturedPiecePanel(ArrayList<Piece> capturedPieces) {
+//        JPanel whitePanel1 = new JPanel();
+//        whitePanel1.setLayout(new BoxLayout(whitePanel1, BoxLayout.Y_AXIS));
+//        JPanel blackPanel1 = new JPanel();
+//        blackPanel1.setLayout(new BoxLayout(blackPanel1, BoxLayout.Y_AXIS));
+//
+//        ArrayList<Piece> capturedWhite = new ArrayList<>();
+//        ArrayList<Piece> capturedBlack = new ArrayList<>();
+//
+//        for (Piece p : capturedPieces) {
+//            if(p.isWhite()) {
+//                capturedWhite.add(p);
+//            } else {
+//                capturedBlack.add(p);
+//            }
+//        }
+//
+//        for(Piece p : capturedWhite) {
+//            ImageIcon imageIcon = new ImageIcon(p.image);
+//            JLabel label = new JLabel(imageIcon);
+//            whitePanel1.add(label);
+//        }
+//
+//        for(Piece p : capturedBlack) {
+//            ImageIcon imageIcon = new ImageIcon(p.image);
+//            JLabel label = new JLabel(imageIcon);
+//            blackPanel1.add(label);
+//        }
+//
+//        piecePanel.removeAll();
+//        piecePanel.add(whitePanel1);
+//        piecePanel.add(blackPanel1);
+//
+//        piecePanel.repaint();
+//        piecePanel.revalidate();
+//    }
 
     public void setCheck(Piece king) {
         int row = king.getRow();
