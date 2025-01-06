@@ -44,7 +44,7 @@ public class AIPlayer implements Player {
         }
 
         // Find the best move
-        currMove = getBestMoveMinimax(board);
+        currMove = getBestMoveAlphaBeta(board);
 
         return currMove;
     }
@@ -102,6 +102,242 @@ public class AIPlayer implements Player {
     public long totalNodes = 0;
 
 
+    public Move getBestMoveAlphaBeta(Board board) {
+        long start = System.nanoTime();
+        int bestEval = MIN;
+        totalNodes = 0;
+        totalTime = 0;
+        Move bestMove = null;
+
+        HashMap<Piece, ArrayList<int[]>> moves = board.getAllPossibleMoves(color);
+
+        for (Piece piece : moves.keySet()) {
+            ArrayList<int[]> pMoves = new ArrayList<>(moves.get(piece));
+            for (int[] move : pMoves) {
+                Move currMove = new Move(piece, move[0], move[1]);
+                board.movePiece(currMove);
+                int eval = - negamax(board, depth - 1, MIN, MAX, color); // negative --> good for opponent = bad for us
+                board.undoLastMove();
+
+                if (eval > bestEval) {
+                    bestEval = eval;
+                    bestMove = currMove;
+                }
+            }
+        }
+
+        totalTime = (System.nanoTime() - start);
+
+        return bestMove;
+    }
+
+    /**
+     * Negamax is slightly optimized of min-max that flips score rather than writing two separate functions
+     * Alpha Beta works by eliminating nodes that cannot beat already analyzed positions at tree level
+     *
+     * @return - Evaluation of board from current player's perspective
+     */
+    public int negamax(Board board, int depth, int alpha, int beta, boolean color) {
+        totalNodes++;
+
+        if (depth == 0) {
+            return evaluate(board, color);
+        }
+
+        int bestEval = MIN;
+
+        HashMap<Piece, ArrayList<int[]>> moves = board.getAllPossibleMoves(color);
+
+        if(moves.isEmpty()) {
+            if(board.inCheck(color)) {
+                return MIN;
+            }
+            return 0;
+        }
+
+        for (Piece p : moves.keySet()) {
+            ArrayList<int[]> pMoves = new ArrayList<>(moves.get(p));
+            for (int[] move : pMoves) {
+                board.movePiece(new Move(p, move[0], move[1]));
+                int eval = - negamax(board, depth - 1, -beta, -alpha, !color); // negative --> good for opponent = bad for us
+                board.undoLastMove();
+
+                bestEval = Math.max(bestEval, eval);
+                alpha = Math.max(alpha, eval);
+
+                if (alpha >= beta) {
+                    // Move too good, opponent will avoid this position
+                    break;
+                }
+            }
+        }
+
+        return bestEval;
+    }
+
+    public int evaluate(Board board, boolean color) {
+        int score = 0;
+
+        int numK = 0, numEK = 0;
+        int numQ = 0, numEQ = 0;
+        int numR = 0, numER = 0;
+        int numB = 0, numEB = 0;
+        int numN = 0, numEN = 0;
+        int numP = 0, numEP = 0;
+        int doubledPawns = 0;
+        int doubledEPawns = 0;
+        int blockedPawns = 0;
+        int blockedEPawns = 0;
+        int isolatedPawns = 0;
+        int isolatedEPawns = 0;
+        int mobility = 0;
+        int mobilityE = 0;
+
+        /* Symmetric evaluation function:
+         * f(p) = 200(K-K')
+         *        + 9(Q-Q')
+         *        + 5(R-R')
+         *        + 3(B-B' + N-N')
+         *        + 1(P-P')
+         *        - 0.5(D-D' + S-S' + I-I')
+         *        + 0.1(M-M') + ...
+         *
+         * KQRBNP = number of kings, queens, rooks, bishops, knights and pawns
+         * D,S,I = doubled, blocked and isolated pawns
+         * M = Mobility (the number of legal moves)
+         */
+
+        boolean[] pawnPresence = new boolean[8];
+        boolean[] pawnEPresence = new boolean[8];
+        for (int col = 0; col < 8; col++) {
+            boolean columnHasPawn = false;
+            boolean columnHasEPawn = false;
+            for (int row = 0; row < 8; row++) {
+                Piece p = board.findPieceByLocation(row, col);
+                if (p==null) {
+                    continue;
+                }
+                boolean sameColor = p.isWhite() == color;
+                if (sameColor) {
+                    switch(p.getType()) {
+                        case "king":
+                            numK++;
+                            break;
+                        case "queen":
+                            numQ++;
+                            break;
+                        case "rook":
+                            numR++;
+                            break;
+                        case "bishop":
+                            numB++;
+                            break;
+                        case "knight":
+                            numN++;
+                            break;
+                        case "pawn":
+                            numP++;
+                            // double pawns - when two or more pawns of same color are on the same column
+                            if(columnHasPawn) doubledPawns++;
+                            columnHasPawn = true;
+
+                            // blocked pawns - pawns that can't move forward because another piece (regardless of color) is directly in front of it
+                            int forwardDirection = color ? -1 : 1;
+                            int nextRow = forwardDirection + row;
+                            if (nextRow >= 0 && nextRow < 8
+                                    && board.findPieceByLocation(nextRow,col)!=null) {
+                                blockedPawns++;
+                            }
+                    }
+                } else {
+                    switch(p.getType()) {
+                        case "king":
+                            numEK++;
+                            break;
+                        case "queen":
+                            numEQ++;
+                            break;
+                        case "rook":
+                            numER++;
+                            break;
+                        case "bishop":
+                            numEB++;
+                            break;
+                        case "knight":
+                            numEN++;
+                            break;
+                        case "pawn":
+                            numEP++;
+                            // double pawns - when two or more pawns of same color are on the same column
+                            if(columnHasPawn) doubledEPawns++;
+                            columnHasPawn = true;
+
+                            // blocked pawns - pawns that can't move forward because another piece (regardless of color) is directly in front of it
+                            int forwardDirection = color ? -1 : 1;
+                            int nextRow = forwardDirection + row;
+                            if (nextRow >= 0 && nextRow < 8
+                                    && board.findPieceByLocation(nextRow,col)!=null) {
+                                blockedEPawns++;
+                            }
+                    }
+                }
+
+            }
+            pawnPresence[col] = columnHasPawn;
+            pawnEPresence[col] = columnHasEPawn;
+        }
+
+        // Check for isolates pawns - pawns that don't have any pawns on their left column and right column
+        for (int i = 0; i < 8; i++) {
+            boolean isoPawn = true;
+            boolean isoEPawn = true;
+            if (i > 0) { // check left column
+                if(pawnPresence[i - 1]) isoPawn = false;
+                if(pawnEPresence[i - 1]) isoEPawn = false;
+            }
+            if (i < 7) { // check right column
+                if(pawnPresence[i + 1]) isoPawn = false;
+                if(pawnPresence[i + 1]) isoEPawn = false;
+            }
+            if(isoPawn) isolatedPawns++;
+            if(isoEPawn) isolatedEPawns++;
+        }
+
+        // Update mobility
+        mobility = countMobility(board, color);
+        mobilityE = countMobility(board, !color);
+
+
+        score = 2000 * (numK - numEK) +
+                90 * (numQ - numEQ) +
+                50 * (numR - numER) +
+                30 * ((numB - numEB) + (numN - numEN)) +
+                10 * (numP - numEP) -
+                5 * ((doubledPawns - doubledEPawns) +
+                        (blockedPawns - blockedEPawns) +
+                        (isolatedPawns - isolatedEPawns)) +
+                1 * (mobility - mobilityE);
+
+        return score;
+    }
+
+    public int countMobility(Board board, boolean color) {
+        int count = 0;
+        HashMap<Piece, ArrayList<int[]>> moves = board.getAllPossibleMoves(color);
+        for (Piece p : moves.keySet()) {
+            ArrayList<int[]> pMoves = new ArrayList<>(moves.get(p));
+            count += pMoves.size();
+        }
+        return count;
+    }
+
+
+    /*
+    Below are simpler versions of the above search and evaluation methods,
+    kept for benchmark testing and learning documentation purposes.
+    Note: None are used in the actual game.
+    */
+
     public Move getBestMoveMinimax(Board board) {
         int bestEval = MIN;
         Move bestMove = null;
@@ -131,35 +367,6 @@ public class AIPlayer implements Player {
         return bestMove;
     }
 
-    public Move getBestMoveAlphaBeta(Board board) {
-        long start = System.nanoTime();
-        totalNodes = 0;
-        totalTime = 0;
-        Move bestMove = null;
-        int alpha = MIN;
-
-        HashMap<Piece, ArrayList<int[]>> moves = board.getAllPossibleMoves(color);
-
-        for (Piece piece : moves.keySet()) {
-            ArrayList<int[]> pMoves = new ArrayList<>(moves.get(piece));
-            for (int[] move : pMoves) {
-                Move currMove = new Move(piece, move[0], move[1]);
-                board.movePiece(currMove);
-                int score = negamax(board, depth - 1, -alpha - 1, -alpha, color); // negative --> good for opponent = bad for us
-                board.undoLastMove();
-                if (score > alpha) {
-                    alpha = score;
-                    bestMove = currMove;
-                }
-            }
-        }
-
-        totalTime = (System.nanoTime() - start);
-
-        return bestMove;
-    }
-
-
     /**
      * Search algorithm that traverses game tree to explore all possible moves for each player
      * Note: Not efficient due to the excessive branching factor of ~ 35 on average for possible chess paths
@@ -170,7 +377,7 @@ public class AIPlayer implements Player {
     private int minimax(Board board, int depth, boolean maximizingPLayer) {
         totalNodes++;
         if (depth == 0) {
-            return evaluateBoard(board);
+            return basicMinimaxEvaluation(board);
         }
 
         // If players turn, return the highest possible outcome given a certain move
@@ -204,46 +411,6 @@ public class AIPlayer implements Player {
         }
     }
 
-    /**
-     * Negamax is slightly optimized of min-max that flips score rather than writing two separate functions
-     * Alpha Beta works by eliminating nodes that cannot beat already analyzed positions at tree level
-     *
-     * @return - Evaluation score viewed from perspective of side to move. Negates return value
-     *            to reflect change and perspective of successor
-     */
-    public int negamax(Board board, int depth, int alpha, int beta, boolean color) {
-        totalNodes++;
-
-        if (depth == 0) {
-            return negaEvaluation(board, color);
-        }
-
-        HashMap<Piece, ArrayList<int[]>> moves = board.getAllPossibleMoves(color);
-
-        if(moves.isEmpty()) {
-            if(board.inCheck(color)) {
-                return MIN;
-            }
-            return 0;
-        }
-
-        for (Piece p : moves.keySet()) {
-            ArrayList<int[]> pMoves = new ArrayList<>(moves.get(p));
-            for (int[] move : pMoves) {
-                board.movePiece(new Move(p, move[0], move[1]));
-                int eval = - negamax(board, depth - 1, -beta, -alpha, !color); // negative --> good for opponent = bad for us
-                board.undoLastMove();
-                if (eval >= beta) {
-                    // Move too good, opponent will avoid this position
-                    return beta; // *Snip*
-                }
-                alpha = Math.max(alpha, eval);
-            }
-        }
-
-        return alpha;
-    }
-
     Map<String, Integer> pieceValues = Map.of(
             "pawn", 1,
             "knight", 3,
@@ -252,14 +419,14 @@ public class AIPlayer implements Player {
             "queen", 9
     );
 
-    public int evaluateBoard(Board board) {
+    public int basicMinimaxEvaluation(Board board) {
         int whiteEval = countMaterial(true, board);
         int blackEval = countMaterial(false, board);
 
         return whiteEval - blackEval;
     }
 
-    public int negaEvaluation(Board board, boolean color) {
+    public int basicNegamaxEvaluation(Board board, boolean color) {
         int whiteEval = countMaterial(true, board);
         int blackEval = countMaterial(false, board);
 
