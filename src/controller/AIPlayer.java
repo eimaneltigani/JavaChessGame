@@ -10,7 +10,6 @@ import java.util.*;
 
 public class AIPlayer implements Player {
     ChessGUI gui;
-    Board board;
     Move currMove;
     boolean color;
     boolean inCheck;
@@ -44,7 +43,7 @@ public class AIPlayer implements Player {
         }
 
         // Find the best move
-        currMove = getBestMoveAlphaBeta(board);
+        currMove = getBestMoveAlphaBeta(board, depth);
 
         return currMove;
     }
@@ -102,7 +101,7 @@ public class AIPlayer implements Player {
     public long totalNodes = 0;
 
 
-    public Move getBestMoveAlphaBeta(Board board) {
+    public Move getBestMoveAlphaBeta(Board board, int depth) {
         long start = System.nanoTime();
         int bestEval = MIN;
         totalNodes = 0;
@@ -150,7 +149,7 @@ public class AIPlayer implements Player {
 
         if(moves.isEmpty()) {
             if(board.inCheck(color)) {
-                return MIN;
+                return bestEval;
             }
             return 0;
         }
@@ -175,6 +174,8 @@ public class AIPlayer implements Player {
         return bestEval;
     }
 
+
+    // Always evaluate from current players perspective
     public int evaluate(Board board, boolean color) {
         int score = 0;
 
@@ -338,7 +339,7 @@ public class AIPlayer implements Player {
     Note: None are used in the actual game.
     */
 
-    public Move getBestMoveMinimax(Board board) {
+    public Move getBestMoveMinimax(Board board, int depth) {
         int bestEval = MIN;
         Move bestMove = null;
 
@@ -377,7 +378,11 @@ public class AIPlayer implements Player {
     private int minimax(Board board, int depth, boolean maximizingPLayer) {
         totalNodes++;
         if (depth == 0) {
-            return basicMinimaxEvaluation(board);
+            int score = evaluate(board, maximizingPLayer);
+            if(maximizingPLayer!=color) {
+                return -score;
+            }
+            return score;
         }
 
         // If players turn, return the highest possible outcome given a certain move

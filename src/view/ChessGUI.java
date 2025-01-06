@@ -26,7 +26,6 @@ public class ChessGUI implements ActionListener {
     JPanel humanPanel;
     JPanel computerPanel;
     JPanel piecePanel;
-    JLabel turnLabel;
     JPanel promotionalPanel;
     JLayeredPane layeredPane;
     PieceButton[][] buttons = new PieceButton[8][8];
@@ -159,30 +158,26 @@ public class ChessGUI implements ActionListener {
         JPanel playerPanel = new JPanel(new GridBagLayout());
         playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
 
-        // Add vertical padding at the top
         playerPanel.add(Box.createVerticalGlue());
 
         JLabel iconLabel = new JLabel(new ImageIcon(iconPath));
         iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         playerPanel.add(iconLabel);
 
-        // Create and add the text label
         JLabel textLabel = new JLabel(playerName);
         textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         playerPanel.add(textLabel);
 
-        // Add vertical padding at the bottom
         playerPanel.add(Box.createVerticalGlue());
 
-        // Add padding and set initial border
         playerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         return playerPanel;
     }
 
+    // Bottom left panel will display both teams captured pieces
     private void configureCapturedPanel() {
         JPanel titlePanel = new JPanel();
         titlePanel.setPreferredSize(new Dimension(300, 100));
-//        titlePanel.setBackground(Color.LIGHT_GRAY);
 
         JLabel titleLabel = new JLabel("Captured:");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
@@ -218,7 +213,7 @@ public class ChessGUI implements ActionListener {
             String imagePath = "res/piece/" + color + "-" + pieceNames[i] + ".png";
             ImageIcon originalImage = new ImageIcon(imagePath);
             Image scaledImage = originalImage.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
-            pieceIcon.setIcon(new ImageIcon(scaledImage)); // Get an icon for the piece
+            pieceIcon.setIcon(new ImageIcon(scaledImage)); // Resize icon
             piecePanel.add(pieceIcon, BorderLayout.CENTER);
 
             JLabel capturedCount = new JLabel("0");
@@ -265,7 +260,6 @@ public class ChessGUI implements ActionListener {
         buttons[endRow][endCol].setPiece(pieceMoved);
     }
 
-
     // Updates captured piece panel after each kill
     public void updateCapturedPanel(ArrayList<Piece> capturedPieces) {
         int[][] capturedCount = new int[2][5];
@@ -295,45 +289,6 @@ public class ChessGUI implements ActionListener {
         }
     }
 
-
-    // Updates captured piece panel after each kill
-//    public void updateCapturedPiecePanel(ArrayList<Piece> capturedPieces) {
-//        JPanel whitePanel1 = new JPanel();
-//        whitePanel1.setLayout(new BoxLayout(whitePanel1, BoxLayout.Y_AXIS));
-//        JPanel blackPanel1 = new JPanel();
-//        blackPanel1.setLayout(new BoxLayout(blackPanel1, BoxLayout.Y_AXIS));
-//
-//        ArrayList<Piece> capturedWhite = new ArrayList<>();
-//        ArrayList<Piece> capturedBlack = new ArrayList<>();
-//
-//        for (Piece p : capturedPieces) {
-//            if(p.isWhite()) {
-//                capturedWhite.add(p);
-//            } else {
-//                capturedBlack.add(p);
-//            }
-//        }
-//
-//        for(Piece p : capturedWhite) {
-//            ImageIcon imageIcon = new ImageIcon(p.image);
-//            JLabel label = new JLabel(imageIcon);
-//            whitePanel1.add(label);
-//        }
-//
-//        for(Piece p : capturedBlack) {
-//            ImageIcon imageIcon = new ImageIcon(p.image);
-//            JLabel label = new JLabel(imageIcon);
-//            blackPanel1.add(label);
-//        }
-//
-//        piecePanel.removeAll();
-//        piecePanel.add(whitePanel1);
-//        piecePanel.add(blackPanel1);
-//
-//        piecePanel.repaint();
-//        piecePanel.revalidate();
-//    }
-
     public void setCheck(Piece king) {
         int row = king.getRow();
         int col = king.getCol();
@@ -355,7 +310,7 @@ public class ChessGUI implements ActionListener {
 
     /* Below functions are only called in user class to enable user interaction **/
 
-    // A function that highlights the possible moves after user click specified piece
+    // A function that highlights the possible moves after user selects piece to move
     public void highlightLegalMoves(ArrayList<int[]> legalMoves) {
         if (legalMoves == null) {
             System.out.println("no legal moves for selected piece, pick another one!");

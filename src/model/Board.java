@@ -2,7 +2,6 @@ package model;
 
 import model.pieces.*;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,7 +9,9 @@ import java.util.Stack;
 
 
 /**
- * Game board data structure.
+ * Game board data structure. Defines all the pieces and positions.
+ * Handles all updates to board and provides additional functionality
+ * such as returning legal moves based off current state of game.
  */
 public class Board {
 
@@ -119,10 +120,6 @@ public class Board {
 
     // Function to eliminate the possible moves that will put the king in danger
     public HashMap<Piece, ArrayList<int[]>> getAllPossibleMoves(boolean color) {
-        if (inCheck(color)) {
-            System.out.println(color + "player is in check!");
-        }
-
         HashMap<Piece, ArrayList<int[]>> map = new HashMap<>();
         ArrayList<Piece> playerPieces = new ArrayList<>(color ? whitePieces : blackPieces); // Cloning Collections for Safe Iteration
 
@@ -312,19 +309,6 @@ public class Board {
         return false;
     }
 
-    public boolean isCheckMate(boolean color) {
-        if(inCheck(color)) {
-            return getAllPossibleMoves(color).isEmpty();
-        }
-
-        return false;
-    }
-
-    public void copyBoard(ArrayList<Piece> source, ArrayList<Piece> target) {
-        target.clear();
-        target.addAll(source);
-    }
-
     public void setBoard(Piece[][] board) {
         this.board = board;
     }
@@ -333,24 +317,12 @@ public class Board {
         return board;
     }
 
-    public void setAllPieces(ArrayList<Piece> allPieces) {
-        this.allPieces = allPieces;
-    }
-
     public ArrayList<Piece> getAllPieces() {
         return allPieces;
     }
 
-    public void setWhitePieces(ArrayList<Piece> whitePieces) {
-        this.whitePieces = whitePieces;
-    }
-
     public ArrayList<Piece> getWhitePieces() {
         return whitePieces;
-    }
-
-    public void setBlackPieces(ArrayList<Piece> blackPieces) {
-        this.blackPieces = blackPieces;
     }
 
     public ArrayList<Piece> getBlackPieces() {

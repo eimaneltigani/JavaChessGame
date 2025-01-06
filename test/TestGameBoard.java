@@ -152,20 +152,25 @@ public class TestGameBoard {
 
     @Test
     public void testMinMaxSearchPerformance() {
-        Player ai = new AIPlayer();
-        ((AIPlayer) ai).getBestMoveMinimax(board);
+        int depth = 3;
+
+        AIPlayer ai = new AIPlayer();
+        ai.getBestMoveMinimax(board, depth);
+        long minimaxNodes = ai.totalNodes;
+        long minimaxTime = ai.totalTime;
+
+        AIPlayer ai2 = new AIPlayer();
+        ai2.getBestMoveAlphaBeta(board, depth);
+        long negamaxNodes = ai2.totalNodes;
+        long negamaxTime = ai2.totalTime;
 
         System.out.println("Results for minimax search:");
-        System.out.println(((AIPlayer) ai).totalNodes + " nodes searched in " + ((AIPlayer) ai).totalTime);
-    }
+        System.out.println(minimaxNodes + " nodes searched in " + minimaxTime);
+        System.out.println("Results for alpha-beta search:");
+        System.out.println(negamaxNodes + " nodes searched in " + negamaxTime);
 
-    @Test
-    public void testNegamaxSearchPerformance() {
-        Player ai = new AIPlayer();
-        ((AIPlayer) ai).getBestMoveAlphaBeta(board);
-
-        System.out.println("Results for minimax search:");
-        System.out.println(((AIPlayer) ai).totalNodes + " nodes searched in " + ((AIPlayer) ai).totalTime);
+        assertTrue("Minimax search takes longest", minimaxTime >= negamaxTime);
+        assertTrue("Minimax searches more nodes", minimaxNodes >= negamaxNodes);
     }
 
 }
