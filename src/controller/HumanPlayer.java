@@ -42,8 +42,7 @@ public class HumanPlayer implements Player, ClickListener {
         // enable clicks for user pieces
         availablePiecesToMove = board.getAllPossibleMoves(color);
         if(availablePiecesToMove.isEmpty()) {
-            if (inCheck) { System.out.println("~~~~~~Games over, human is defeated ~~~~~~~~~"); }
-            else { System.out.println("~~~~~~Games over, it's a draw ~~~~~~~~~"); }
+            return null;
         }
         gui.enableUserClicks(availablePiecesToMove);
 

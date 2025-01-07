@@ -19,6 +19,16 @@ public class Main {
 
         while (true) {
             Move move = currPlayer.decideMove(board);
+            if(move==null) {
+                System.out.println("~~~~~~~~~~Game over: " + currPlayer.getColor() + " player defeated~~~~~~~~~~~");
+                while (true) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
             currPlayer.update(board, move);
 
             currPlayer = currPlayer.getColor() ? p2 : p1;
