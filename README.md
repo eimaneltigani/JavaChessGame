@@ -12,7 +12,7 @@ Built using Java Swing with simple and easy-to-use features:
 
 ## The AI Engine
 The Computer Player uses a decision-making algorithm used in two-player games called Minimax.
-It is a recursive algorithm that evaluates possible moves and finds the best move based off the outcome and static evaluation of the board. 
+The algorithm evaluates all possible moves of a player and returns the best move based off the potential outcome of the board and its corresponding score. 
 Based off the assumption the opponent will play their most optimal move (providing the worst score for the player), the search will return the maximum or minimum score based off who's turn it is throughout the game tree.
 
 ## Performance optimization
@@ -28,4 +28,4 @@ After returning all the possible outcomes at the base of the tree, it is now the
 | Nodes reached: | 11,513    | 6,322        |
 | Time elapsed:  | 995.73 ms | 421.19 ms    |
 
-Though I implemented only one of many available algorithms/strategies, the above comparison shows the significant difference with just one technique! See below if you'd like to learn of other common methods for improvement.
+Though I implemented only one of many optimization techniques, the above comparison shows the significant difference with just one technique! 
