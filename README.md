@@ -6,7 +6,7 @@
 Built using Java Swing with simple and easy-to-use features:
 * Available moves are highlighted after user-click
 * Click functionality is only enabled for legal moves, ensuring game accuracy
-* Side panel highlights current players turn and displays captured pieces are displayed for both teams
+* Side panel highlights current players turn and displays captured pieces for both teams
 * Supports castling, promotional etc.
 * Warning when King is in check
 
