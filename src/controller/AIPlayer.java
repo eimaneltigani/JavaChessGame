@@ -115,7 +115,7 @@ public class AIPlayer implements Player {
             for (int[] move : pMoves) {
                 Move currMove = new Move(piece, move[0], move[1]);
                 board.movePiece(currMove);
-                int eval = - negamax(board, depth - 1, MIN, MAX, color); // negative --> good for opponent = bad for us
+                int eval = - negamax(board, depth - 1, MIN, MAX, color); // negative --> returning opponents square in our perspective
                 board.undoLastMove();
 
                 if (eval > bestEval) {
@@ -158,7 +158,7 @@ public class AIPlayer implements Player {
             ArrayList<int[]> pMoves = new ArrayList<>(moves.get(p));
             for (int[] move : pMoves) {
                 board.movePiece(new Move(p, move[0], move[1]));
-                int eval = - negamax(board, depth - 1, -beta, -alpha, !color); // negative --> good for opponent = bad for us
+                int eval = - negamax(board, depth - 1, -beta, -alpha, !color); // negative --> returning opponents square in our perspective
                 board.undoLastMove();
 
                 bestEval = Math.max(bestEval, eval);
@@ -270,8 +270,8 @@ public class AIPlayer implements Player {
                         case "pawn":
                             numEP++;
                             // double pawns - when two or more pawns of same color are on the same column
-                            if(columnHasPawn) doubledEPawns++;
-                            columnHasPawn = true;
+                            if(columnHasEPawn) doubledEPawns++;
+                            columnHasEPawn = true;
 
                             // blocked pawns - pawns that can't move forward because another piece (regardless of color) is directly in front of it
                             int forwardDirection = color ? -1 : 1;
@@ -406,7 +406,7 @@ public class AIPlayer implements Player {
                 ArrayList<int[]> pMoves = new ArrayList<>(moves.get(p));
                 for (int[] move : pMoves) {
                     board.movePiece(new Move(p, move[0], move[1]));
-                    int eval = minimax(board, depth - 1, true); // negative --> good for opponent = bad for us
+                    int eval = minimax(board, depth - 1, true);
                     board.undoLastMove();
                     minEval =  Math.min(minEval, eval);
                 }
