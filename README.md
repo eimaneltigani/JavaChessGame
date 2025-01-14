@@ -1,5 +1,5 @@
 # Java Chess Game - Human vs AI
-Written in pure Java, this personal project was developed to deepen my understanding of core coding concepts such as OOP and SOLID principles but also serve as an introductory exploration of more advanced topics I'm interested in, such as game theory and AI. Keep reading to learn more about the implementation, or run the game to enjoy a classic game of chess!
+Written in pure Java, this purpose of this project was to deepen my understanding of core coding concepts such as OOP and SOLID principles and explore more advanced topics I'm interested in, such as game theory and AI. Keep reading to learn more about those implementation, details or run the game to enjoy a classic game of chess!
 
 ![Chess](res/ChessScreenshot.png)
 
@@ -23,17 +23,19 @@ The following prerequisites are necessary for installation:
    ```bash
    git clone https://github.com/eimaneltigani/JavaChessGame.git
    ```
-2. Navigate to the project direction
-2. Compile the Java source files:
+2. Navigate to the project directory
+    ```bash
+    cd JavaChessGame
+    ```
+3. Compile the Java source files:
 
    ```bash
    javac src/**/*.java
    ```
-3. Run the game:
+4. Run the game:
     ```bash
    java -cp out Main
    ```
-Feel free to change the level of difficulty of the game)
 
 ## The GUI
 Built using Java Swing with simple and easy-to-use features:
@@ -67,15 +69,21 @@ Though I implemented only one of many optimization techniques, the above compari
 A simple evaluation of the board is measured using these considerations:
 * Material (sum of piece values of each side)
 * Positional (number of moves compared to opponent)
+* Bonus for captured kill
+* Repeated move penalty
 
-## Further improvements
-Here are some ideas I took note of that would significantly advance the game significantly:  
-* Performance
-  * Using bitboard to represent the board, rather than classes (performance vs readability)
-  * Multi-threading to compute branches in parallel
-  * Using a hashmap to store previous boards
-* Evaluation
-  * The concept of early game, middle game, end game. This interested me because I feel it would better replicate how humans play.
+## Bottlenecks and future considerations
+Here are major improvements and differences and changes I'd make to focus on performance and scalability:  
+* <u>Performance</u>
+  * _Limitation:_ Use of classes for data representation requires lengthy iterations and information retrieval times
+    * **Improvement:** Using bitboard representation for faster computations and improved memory
+  * _Limitation:_ Game runs on a single thread, which limits the speed and interactivity of processing
+    * **Improvement:** Multi-threading to compute branches in parallel and/or create multi-player networks for online gameplay
+  * _Limitation:_ Evaluations are recalculated for each end node, accounting for a significant portion of the search run time
+    * **Improvement:** Using a hashtable to store previous boards and their scores to reduce search space and speed
+* <u>Evaluation</u>
+  * _Limitation:_ My simplified evaluation highlights metrics not typically found early on in the game like kills, leading the computer to choose random moves and a weak opening strategy
+    * **Improvement:** Defining different rules and advantages based on the current game phase (i.e., opening, middle, end) improves strategy and better replicates how humans play.
 
 
 ### Helpful Resources

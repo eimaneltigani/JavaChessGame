@@ -10,9 +10,9 @@ import java.util.*;
 
 public class AIPlayer implements Player {
     ChessGUI gui;
-    Move currMove;
     boolean color;
     boolean inCheck;
+    Move lastMove = null;
 
     public AIPlayer() {
         this.color = false;
@@ -43,14 +43,13 @@ public class AIPlayer implements Player {
         }
 
         // Find the best move
-        currMove = getBestMoveAlphaBeta(board, depth);
-
-        return currMove;
+        return getBestMoveAlphaBeta(board, depth);
     }
 
     public void update(Board b, Move move) {
         // Update model
         b.movePiece(move);
+        lastMove = move;
 
         // Update view
         SwingUtilities.invokeLater(() -> {
@@ -93,13 +92,12 @@ public class AIPlayer implements Player {
         return color;
     }
 
+
     public static final int MAX = Integer.MAX_VALUE;
     public static final int MIN = Integer.MIN_VALUE;
 
-
     public long totalTime = 0;
     public long totalNodes = 0;
-
 
     public Move getBestMoveAlphaBeta(Board board, int depth) {
         long start = System.nanoTime();
@@ -116,6 +114,20 @@ public class AIPlayer implements Player {
                 Move currMove = new Move(piece, move[0], move[1]);
                 board.movePiece(currMove);
                 int eval = - negamax(board, depth - 1, MIN, MAX, color); // negative --> returning opponents square in our perspective
+
+                // add bonus for captured moves
+                if (currMove.isCaptured()) {
+                    int capturedValue = pieceValues.get(currMove.getPiece().getType());
+                    int capturingValue = pieceValues.get(board.getLastCapturedPiece().getType());
+                    if (!board.getPlayersPieces(color).contains(currMove.getPiece())) {
+                        eval += (capturedValue - capturingValue) * 2; // Encourage good trades
+                    } else {
+                        eval += (capturedValue * 100); // encourage easy kills with no sacrifice
+                    }
+                }
+
+                // add reversal penalty
+                eval -= evaluateReversalPenalty(currMove);
                 board.undoLastMove();
 
                 if (eval > bestEval) {
@@ -128,6 +140,18 @@ public class AIPlayer implements Player {
         totalTime = (System.nanoTime() - start);
 
         return bestMove;
+    }
+
+    private int evaluateReversalPenalty(Move currMove) {
+        // Check is computer is doing reversal move, e.g. Knight A -> B then Knight B -> A
+        if (lastMove != null && currMove.getPiece() == lastMove.getPiece()) {
+            if(lastMove.getCurrRow()==currMove.getTargetRow() &&
+                    lastMove.getCurrCol()==currMove.getTargetCol() &&
+                        !lastMove.isCaptured() && !currMove.isCaptured()) {
+                return -10;
+            }
+        }
+        return 0;
     }
 
     /**
@@ -417,11 +441,12 @@ public class AIPlayer implements Player {
     }
 
     Map<String, Integer> pieceValues = Map.of(
-            "pawn", 1,
-            "knight", 3,
-            "bishop", 3,
-            "rook", 5,
-            "queen", 9
+            "pawn", 10,
+            "knight", 30,
+            "bishop", 30,
+            "rook", 50,
+            "queen", 90,
+            "king", 2000
     );
 
     public int basicMinimaxEvaluation(Board board) {

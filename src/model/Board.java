@@ -333,6 +333,10 @@ public class Board {
         return capturedPieces;
     }
 
+    public Piece getLastCapturedPiece() {
+        return capturedPieces.get(capturedPieces.size()-1);
+    }
+
     public ArrayList<Piece> getPlayersPieces(boolean color) {
         return color ? whitePieces : blackPieces;
     }
