@@ -29,7 +29,7 @@ public abstract class Piece {
         this.col = col;
         this.row = row;
         char colorChar = isWhite ? 'w' : 'b';
-        String imagePath = MessageFormat.format("/piece/{0}-{1}", colorChar, typeIn);
+        String imagePath = MessageFormat.format("/{0}-{1}", colorChar, typeIn);
         this.image = getImage(imagePath);
     }
 

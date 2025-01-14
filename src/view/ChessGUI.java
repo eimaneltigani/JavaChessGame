@@ -138,8 +138,8 @@ public class ChessGUI implements ActionListener {
         playerPanel.setBackground(Color.GRAY);
         playerPanel.setLayout(new GridLayout(1,2));
         // create panels for each player
-        humanPanel = createPlayerPanel("Human Player",  "res/piece/w-king.png");
-        computerPanel = createPlayerPanel("Computer Player",  "res/piece/b-king.png");
+        humanPanel = createPlayerPanel("Human Player",  "res/w-king.png");
+        computerPanel = createPlayerPanel("Computer Player",  "res/b-king.png");
         playerPanel.add(humanPanel);
         playerPanel.add(computerPanel);
 
@@ -211,7 +211,7 @@ public class ChessGUI implements ActionListener {
             // Add piece image
             JLabel pieceIcon = new JLabel();
             pieceIcon.setHorizontalAlignment(SwingConstants.CENTER);
-            String imagePath = "res/piece/" + color + "-" + pieceNames[i] + ".png";
+            String imagePath = "res/" + color + "-" + pieceNames[i] + ".png";
             ImageIcon originalImage = new ImageIcon(imagePath);
             Image scaledImage = originalImage.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
             pieceIcon.setIcon(new ImageIcon(scaledImage)); // Resize icon
