@@ -27,12 +27,21 @@ The following prerequisites are necessary for installation:
     ```bash
     cd JavaChessGame
     ```
-3. Compile the Java source files:
+3. Create output folder to build manually
+    ```bash
+    cd mkdir -p out
+    ```
+4. Compile the Java source files:
 
    ```bash
-   javac src/**/*.java
+   javac -d out src/main/java/**/*.java
    ```
-4. Run the game:
+5. Copy resources (images) to output directory:
+
+   ```bash
+   cp -r src/main/res/* out/ 
+   ```
+6. Run the game:
     ```bash
    java -cp out Main
    ```
