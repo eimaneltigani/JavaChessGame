@@ -1,5 +1,4 @@
 import controller.AIPlayer;
-import controller.Player;
 import model.Board;
 import model.Move;
 import model.Piece;

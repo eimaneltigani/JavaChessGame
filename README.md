@@ -1,7 +1,7 @@
 # Java Chess Game - Human vs AI
 Written in pure Java, this purpose of this project was to deepen my understanding of core coding concepts such as OOP and SOLID principles and explore more advanced topics I'm interested in, such as game theory and AI. Keep reading to learn more about those implementation, details or run the game to enjoy a classic game of chess!
 
-![Chess](res/ChessScreenshot.png)
+![Chess](src/main/res/ChessScreenshot.png)
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)

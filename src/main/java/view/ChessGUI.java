@@ -9,6 +9,7 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -138,8 +139,8 @@ public class ChessGUI implements ActionListener {
         playerPanel.setBackground(Color.GRAY);
         playerPanel.setLayout(new GridLayout(1,2));
         // create panels for each player
-        humanPanel = createPlayerPanel("Human Player",  "res/w-king.png");
-        computerPanel = createPlayerPanel("Computer Player",  "res/b-king.png");
+        humanPanel = createPlayerPanel("Human Player",  "w-king.png");
+        computerPanel = createPlayerPanel("Computer Player",  "b-king.png");
         playerPanel.add(humanPanel);
         playerPanel.add(computerPanel);
 
@@ -160,7 +161,8 @@ public class ChessGUI implements ActionListener {
 
         playerPanel.add(Box.createVerticalGlue());
 
-        JLabel iconLabel = new JLabel(new ImageIcon(iconPath));
+        URL resource = getClass().getClassLoader().getResource(iconPath);
+        JLabel iconLabel = new JLabel(new ImageIcon(resource));
         iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         playerPanel.add(iconLabel);
 
@@ -211,8 +213,9 @@ public class ChessGUI implements ActionListener {
             // Add piece image
             JLabel pieceIcon = new JLabel();
             pieceIcon.setHorizontalAlignment(SwingConstants.CENTER);
-            String imagePath = "res/" + color + "-" + pieceNames[i] + ".png";
-            ImageIcon originalImage = new ImageIcon(imagePath);
+            String imagePath = color + "-" + pieceNames[i] + ".png";
+            URL resource = getClass().getClassLoader().getResource(imagePath);
+            ImageIcon originalImage = new ImageIcon(resource);
             Image scaledImage = originalImage.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
             pieceIcon.setIcon(new ImageIcon(scaledImage)); // Resize icon
             piecePanel.add(pieceIcon, BorderLayout.CENTER);
